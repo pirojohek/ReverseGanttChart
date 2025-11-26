@@ -18,6 +18,15 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      password: password
+      timeout: 2000ms
+
+
 jwt:
   cookie-token-key: '{"kty":"oct","k":"956PBFst1FguLr5irJD-aQ"}'
 logging:
@@ -25,3 +34,11 @@ logging:
     by.pirog.ReverseGanttChart: DEBUG
     org.springframework.web: DEBUG
     org.hibernate: DEBUG
+
+app:
+  security:
+    token:
+      blacklist-token-project-ttl: 2d
+      blacklist-token-project-prefix: "blacklist:project:"
+      blacklist-token-auth-ttl: 7d
+      blacklist-token-auth-prefix: "blacklist:auth:"

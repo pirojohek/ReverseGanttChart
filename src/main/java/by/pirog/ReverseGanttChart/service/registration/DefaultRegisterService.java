@@ -1,11 +1,10 @@
-package by.pirog.ReverseGanttChart.service;
+package by.pirog.ReverseGanttChart.service.registration;
 
 import by.pirog.ReverseGanttChart.dto.RegisteredResponseDto;
 import by.pirog.ReverseGanttChart.dto.RegistrationDto;
 import by.pirog.ReverseGanttChart.storage.entity.UserEntity;
 import by.pirog.ReverseGanttChart.storage.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

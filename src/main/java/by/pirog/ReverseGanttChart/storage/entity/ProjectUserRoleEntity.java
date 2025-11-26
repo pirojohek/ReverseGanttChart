@@ -17,6 +17,6 @@ public class ProjectUserRoleEntity {
     @Column(name = "c_id")
     private Long id;
 
-    @Column(name = "c_role_name")
+    @Column(name = "c_role_name", unique = true, nullable = false)
     private String roleName;
 }

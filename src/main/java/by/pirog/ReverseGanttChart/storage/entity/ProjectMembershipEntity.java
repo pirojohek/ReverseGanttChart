@@ -9,8 +9,8 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(schema = "storage", name = "t_project_user_role")
-public class UserRoleInProjectEntity {
+@Table(schema = "storage", name = "t_project_membership")
+public class ProjectMembershipEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "c_id")

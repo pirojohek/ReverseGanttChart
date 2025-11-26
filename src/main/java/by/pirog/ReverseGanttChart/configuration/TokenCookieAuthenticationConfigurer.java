@@ -1,23 +1,21 @@
 package by.pirog.ReverseGanttChart.configuration;
 
-import by.pirog.ReverseGanttChart.security.TokenCookieAuthenticationConverter;
+import by.pirog.ReverseGanttChart.security.DualCookieAuthenticationConverter;
 import by.pirog.ReverseGanttChart.security.detailsService.TokenUserDetailsService;
+import by.pirog.ReverseGanttChart.security.filter.LoginIntoProjectCookieAuthenticationFilter;
 import by.pirog.ReverseGanttChart.security.filter.LoginUsernamePasswordAuthenticationFilter;
-import by.pirog.ReverseGanttChart.security.serializer.TokenCookieJweStringSerializer;
 import by.pirog.ReverseGanttChart.security.strategy.TokenCookieSessionAuthenticationStrategy;
 import by.pirog.ReverseGanttChart.security.token.Token;
 import by.pirog.ReverseGanttChart.storage.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesUserDetailsService;
 import org.springframework.security.web.csrf.CsrfFilter;
 
 import java.util.function.Function;
@@ -29,6 +27,9 @@ public class TokenCookieAuthenticationConfigurer
     Function<String, Token> tokenCookieStringDeserializer;
     private final UserRepository userRepository;
     private TokenCookieSessionAuthenticationStrategy tokenCookieSessionAuthenticationStrategy;
+
+    private LoginIntoProjectCookieAuthenticationFilter loginIntoProjectCookieAuthenticationFilter;
+    private LogoutFilter logoutFilter;
 
     public TokenCookieAuthenticationConfigurer(ObjectMapper objectMapper, UserRepository userRepository) {
         this.objectMapper = objectMapper;
@@ -49,20 +50,30 @@ public class TokenCookieAuthenticationConfigurer
                 new TokenUserDetailsService(userRepository)
         );
 
-        var cookieAuthenticationFilter = new AuthenticationFilter(
-                authenticationManager,
-                new TokenCookieAuthenticationConverter(this.tokenCookieStringDeserializer)
-        );
-        cookieAuthenticationFilter.setSuccessHandler((request, response, auth) -> {
-        });
-        cookieAuthenticationFilter.setFailureHandler((request, response, exception) -> {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        });
+        var cookieAuthenticationFilter = getAuthenticationFilter(authenticationManager);
 
-
+        var logoutFilter = this.logoutFilter;
+        http.addFilterAfter(logoutFilter, CsrfFilter.class);
         http.addFilterAfter(usernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(cookieAuthenticationFilter, CsrfFilter.class);
+        http.addFilterAfter(loginIntoProjectCookieAuthenticationFilter, CsrfFilter.class);
         http.authenticationProvider(authenticationProvider);
+    }
+
+    private AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) {
+        var cookieAuthenticationFilter = new AuthenticationFilter(
+                authenticationManager,
+                new DualCookieAuthenticationConverter(this.tokenCookieStringDeserializer)
+        );
+
+        cookieAuthenticationFilter.setSuccessHandler((request, response, auth) -> {
+            // Todo - здесь нужно доделать в случае удачной конвертации
+        });
+        cookieAuthenticationFilter.setFailureHandler((request, response, exception) -> {
+            // Todo здесь нужно доделать ошибку
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        });
+        return cookieAuthenticationFilter;
     }
 
 
@@ -79,4 +90,15 @@ public class TokenCookieAuthenticationConfigurer
         return this;
     }
 
+
+    public TokenCookieAuthenticationConfigurer loginIntoProjectCookieAuthenticationFilter
+            (LoginIntoProjectCookieAuthenticationFilter loginIntoProjectCookieAuthenticationFilter) {
+        this.loginIntoProjectCookieAuthenticationFilter = loginIntoProjectCookieAuthenticationFilter;
+        return this;
+    }
+
+    public TokenCookieAuthenticationConfigurer logoutFilter(LogoutFilter logoutFilter) {
+        this.logoutFilter = logoutFilter;
+        return this;
+    }
 }

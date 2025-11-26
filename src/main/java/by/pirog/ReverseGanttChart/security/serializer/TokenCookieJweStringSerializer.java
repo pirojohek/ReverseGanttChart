@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 public class TokenCookieJweStringSerializer implements Function<Token, String> {
 
-    private final JWEEncrypter jweEncrypter;
+    private final JWEEncrypter jweEncrypter; // алгоритм симметрического шифрования
 
     @Setter
     private JWEAlgorithm jweAlgorithm = JWEAlgorithm.DIR;

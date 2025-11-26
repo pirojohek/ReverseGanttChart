@@ -1,4 +1,4 @@
-package by.pirog.ReverseGanttChart.service;
+package by.pirog.ReverseGanttChart.service.registration;
 
 import by.pirog.ReverseGanttChart.dto.RegisteredResponseDto;
 import by.pirog.ReverseGanttChart.dto.RegistrationDto;

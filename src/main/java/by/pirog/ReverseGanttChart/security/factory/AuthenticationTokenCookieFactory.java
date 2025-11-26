@@ -2,7 +2,6 @@ package by.pirog.ReverseGanttChart.security.factory;
 
 import by.pirog.ReverseGanttChart.security.enums.TokenType;
 import by.pirog.ReverseGanttChart.security.token.Token;
-import by.pirog.ReverseGanttChart.storage.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 
@@ -13,7 +12,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-public class BasicTokenCookieFactory implements Function<Authentication, Token> {
+public class AuthenticationTokenCookieFactory implements Function<Authentication, Token> {
 
     private Duration tokenTtl = Duration.ofDays(1);
 

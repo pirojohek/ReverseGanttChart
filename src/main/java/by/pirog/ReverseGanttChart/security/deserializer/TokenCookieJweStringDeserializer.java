@@ -1,5 +1,6 @@
 package by.pirog.ReverseGanttChart.security.deserializer;
 
+import by.pirog.ReverseGanttChart.exception.ExpiredTokenException;
 import by.pirog.ReverseGanttChart.security.enums.TokenType;
 import by.pirog.ReverseGanttChart.security.token.Token;
 import com.nimbusds.jose.JOSEException;
@@ -8,6 +9,7 @@ import com.nimbusds.jwt.EncryptedJWT;
 
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -28,6 +30,11 @@ public class TokenCookieJweStringDeserializer implements Function<String, Token>
 
             var claimsSet = encryptedJwt.getJWTClaimsSet();
             List<String> authorities = claimsSet.getStringListClaim("authorities");
+
+            Date now = new Date();
+            if (claimsSet.getExpirationTime() != null && claimsSet.getExpirationTime().before(now)) {
+                throw new ExpiredTokenException("Token is expired");
+            }
 
             return new Token(UUID.fromString(claimsSet.getJWTID()), claimsSet.getSubject(),
                     authorities, claimsSet.getLongClaim("projectId"),

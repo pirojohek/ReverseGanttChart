@@ -26,7 +26,7 @@ CREATE TABLE storage.t_project_user_role
 );
 
 -- Создание таблицы связи пользователей с проектами и ролями
-CREATE TABLE storage.t_role_project
+CREATE TABLE storage.t_project_membership
 (
     c_id        SERIAL PRIMARY KEY,
     c_user_role INTEGER NOT NULL REFERENCES storage.t_project_user_role (c_id),

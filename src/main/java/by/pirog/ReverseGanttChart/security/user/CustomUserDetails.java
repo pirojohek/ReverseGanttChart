@@ -12,14 +12,24 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
+
 public class CustomUserDetails implements UserDetails {
 
+    @Getter
     private Long id;
+
     private String password;
     private String username;
+
+    @Getter
     private String email;
+
+    @Getter
     private Token token;
+
+    @Getter
+    private UserEntity user;
+
 
     private Collection<GrantedAuthority> authorities;
 
@@ -30,6 +40,7 @@ public class CustomUserDetails implements UserDetails {
         this.email = user.getEmail();
         this.authorities = List.of();
         this.token = null;
+        this.user = user;
     }
 
     public CustomUserDetails(UserEntity user, Token token) {
@@ -41,6 +52,7 @@ public class CustomUserDetails implements UserDetails {
         this.authorities = token.authorities().stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
+        this.user = user;
     }
 
     @Override
@@ -77,4 +89,5 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
 }
