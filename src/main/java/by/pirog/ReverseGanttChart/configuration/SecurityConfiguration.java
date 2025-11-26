@@ -3,6 +3,7 @@ package by.pirog.ReverseGanttChart.configuration;
 import by.pirog.ReverseGanttChart.security.deserializer.TokenCookieJweStringDeserializer;
 import by.pirog.ReverseGanttChart.security.detailsService.CustomUserDetailsService;
 import by.pirog.ReverseGanttChart.security.filter.LoginIntoProjectCookieAuthenticationFilter;
+import by.pirog.ReverseGanttChart.security.securityService.blacklistService.RedisTokenBlacklistService;
 import by.pirog.ReverseGanttChart.security.securityService.tokenService.TokenService;
 import by.pirog.ReverseGanttChart.security.serializer.TokenCookieJweStringSerializer;
 import by.pirog.ReverseGanttChart.security.strategy.TokenCookieSessionAuthenticationStrategy;
@@ -44,7 +45,8 @@ public class SecurityConfiguration {
             UserRepository userRepository,
             TokenService tokenService,
             LoginIntoProjectCookieAuthenticationFilter loginIntoProjectCookieAuthenticationFilter,
-            LogoutFilter logoutFilter
+            LogoutFilter logoutFilter,
+            RedisTokenBlacklistService redisTokenBlacklistService
     ) throws Exception {
         return new TokenCookieAuthenticationConfigurer(objectMapper, userRepository)
                 .tokenCookieStringDeserializer(
@@ -54,7 +56,8 @@ public class SecurityConfiguration {
                 )
                 .tokenCookieAuthenticationStrategy(new TokenCookieSessionAuthenticationStrategy(tokenService))
                 .loginIntoProjectCookieAuthenticationFilter(loginIntoProjectCookieAuthenticationFilter)
-                .logoutFilter(logoutFilter);
+                .logoutFilter(logoutFilter)
+                .redisTokenBlacklistService(redisTokenBlacklistService);
     }
 
 
