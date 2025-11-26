@@ -1,5 +1,6 @@
 package by.pirog.ReverseGanttChart.security;
 
+import by.pirog.ReverseGanttChart.security.securityService.blacklistService.RedisTokenBlacklistService;
 import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
 import by.pirog.ReverseGanttChart.security.token.Token;
 import jakarta.servlet.http.Cookie;
@@ -18,25 +19,42 @@ public class DualCookieAuthenticationConverter implements AuthenticationConverte
 
     private final Function<String, Token> tokenCookieStringDeserializer;
 
-    public DualCookieAuthenticationConverter(Function<String, Token> tokenCookieStringDeserializer) {
+    private final RedisTokenBlacklistService tokenBlacklistService;
+
+    public DualCookieAuthenticationConverter(Function<String, Token> tokenCookieStringDeserializer, RedisTokenBlacklistService tokenBlacklistService) {
         this.tokenCookieStringDeserializer = tokenCookieStringDeserializer;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
     public Authentication convert(HttpServletRequest request) {
+
+        boolean isAuthenticationTokenInBlacklist = checkAuthenticationTokenInBlacklist(request);
+        boolean isProjectTokenInBlacklist = checkProjectTokenInBlacklist(request);
+
         Authentication authenticationAuth = extractAuthenticationTokenToAuth(request);
         Authentication projectAuth = extractProjectTokenToAuth(request);
 
 
-        if (authenticationAuth != null && projectAuth != null) {
+        if (authenticationAuth != null && isAuthenticationTokenInBlacklist && projectAuth != null && isProjectTokenInBlacklist) {
             return new DualPreAuthenticatedAuthenticationToken(authenticationAuth, projectAuth);
-        } else if (authenticationAuth != null) {
+        } else if (authenticationAuth != null && isAuthenticationTokenInBlacklist) {
             return new PreAuthenticatedAuthenticationToken
                     (authenticationAuth.getPrincipal(), authenticationAuth.getCredentials(),
                             authenticationAuth.getAuthorities());
         }
         return null;
     }
+
+     private boolean checkAuthenticationTokenInBlacklist(HttpServletRequest request) {
+        return tokenBlacklistService.isAuthTokenBlacklisted
+                (getCookieValue(request, "__Host-auth-token"));
+     }
+
+     private boolean checkProjectTokenInBlacklist(HttpServletRequest request) {
+        return tokenBlacklistService.isProjectTokenBlacklisted
+                (getCookieValue(request, "__Project-auth-token"));
+     }
 
     private Authentication extractAuthenticationTokenToAuth(HttpServletRequest request){
         String tokenString = getCookieValue(request, "__Host-auth-token");

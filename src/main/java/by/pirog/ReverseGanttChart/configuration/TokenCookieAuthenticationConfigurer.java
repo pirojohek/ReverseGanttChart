@@ -4,6 +4,7 @@ import by.pirog.ReverseGanttChart.security.DualCookieAuthenticationConverter;
 import by.pirog.ReverseGanttChart.security.detailsService.TokenUserDetailsService;
 import by.pirog.ReverseGanttChart.security.filter.LoginIntoProjectCookieAuthenticationFilter;
 import by.pirog.ReverseGanttChart.security.filter.LoginUsernamePasswordAuthenticationFilter;
+import by.pirog.ReverseGanttChart.security.securityService.blacklistService.RedisTokenBlacklistService;
 import by.pirog.ReverseGanttChart.security.strategy.TokenCookieSessionAuthenticationStrategy;
 import by.pirog.ReverseGanttChart.security.token.Token;
 import by.pirog.ReverseGanttChart.storage.repository.UserRepository;
@@ -30,6 +31,8 @@ public class TokenCookieAuthenticationConfigurer
 
     private LoginIntoProjectCookieAuthenticationFilter loginIntoProjectCookieAuthenticationFilter;
     private LogoutFilter logoutFilter;
+
+    private RedisTokenBlacklistService redisTokenBlacklistService;
 
     public TokenCookieAuthenticationConfigurer(ObjectMapper objectMapper, UserRepository userRepository) {
         this.objectMapper = objectMapper;
@@ -63,7 +66,7 @@ public class TokenCookieAuthenticationConfigurer
     private AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) {
         var cookieAuthenticationFilter = new AuthenticationFilter(
                 authenticationManager,
-                new DualCookieAuthenticationConverter(this.tokenCookieStringDeserializer)
+                new DualCookieAuthenticationConverter(this.tokenCookieStringDeserializer, redisTokenBlacklistService)
         );
 
         cookieAuthenticationFilter.setSuccessHandler((request, response, auth) -> {
@@ -99,6 +102,12 @@ public class TokenCookieAuthenticationConfigurer
 
     public TokenCookieAuthenticationConfigurer logoutFilter(LogoutFilter logoutFilter) {
         this.logoutFilter = logoutFilter;
+        return this;
+    }
+
+    public TokenCookieAuthenticationConfigurer redisTokenBlacklistService(
+            RedisTokenBlacklistService redisTokenBlacklistService) {
+        this.redisTokenBlacklistService = redisTokenBlacklistService;
         return this;
     }
 }
