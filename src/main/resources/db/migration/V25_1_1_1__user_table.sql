@@ -15,7 +15,8 @@ CREATE TABLE storage.t_project
     c_id                  SERIAL PRIMARY KEY,
     c_project_name        VARCHAR(512) NOT NULL,
     c_project_description TEXT,
-    c_project_owner       INTEGER REFERENCES storage.t_user (c_id)
+    c_project_owner       INTEGER REFERENCES storage.t_user (c_id),
+    c_deadline            DATE
 );
 
 -- Создание таблицы ролей в проекте
@@ -36,8 +37,8 @@ CREATE TABLE storage.t_project_membership
 );
 
 -- Заполнение ролей
-INSERT INTO storage.t_project_user_role (c_role_name) VALUES
-                                                          ('ROLE_ADMIN'),
-                                                          ('ROLE_VIEWER'),
-                                                          ('ROLE_REVIEWER'),
-                                                          ('ROLE_STUDENT');
+INSERT INTO storage.t_project_user_role (c_role_name)
+VALUES ('ROLE_ADMIN'),
+       ('ROLE_VIEWER'),
+       ('ROLE_REVIEWER'),
+       ('ROLE_STUDENT');

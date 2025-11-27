@@ -35,8 +35,7 @@ public class DualPreAuthenticatedAuthenticationToken extends PreAuthenticatedAut
     }
 
     public Long getProjectId(){
-        Long projectId = ((Token) this.projectAuth.getCredentials()).projectId();
-        return projectId;
+        return ((Token) this.projectAuth.getCredentials()).projectId();
     }
 
 
