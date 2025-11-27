@@ -1,5 +1,6 @@
 package by.pirog.ReverseGanttChart.security.handler;
 
+import by.pirog.ReverseGanttChart.configuration.TokenCookieNameProperties;
 import by.pirog.ReverseGanttChart.security.securityService.blacklistService.RedisTokenBlacklistService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 public class BlacklistLogoutHandler implements LogoutHandler {
 
     private final RedisTokenBlacklistService blacklistService;
+    private final TokenCookieNameProperties tokenCookieNameProperties;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
@@ -34,9 +36,9 @@ public class BlacklistLogoutHandler implements LogoutHandler {
     }
 
     private void invalidateJwtTokens(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String authToken = getCookieValue(request, "__Host-auth-token");
+        String authToken = getCookieValue(request, this.tokenCookieNameProperties.getAuthCookieName());
 
-        String projectToken = getCookieValue(request, "__Host-project-token");
+        String projectToken = getCookieValue(request, this.tokenCookieNameProperties.getProjectCookieName());
 
         if (authToken != null){
             blacklistService.addToBlackListAuthToken(authToken);

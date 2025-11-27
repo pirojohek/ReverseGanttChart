@@ -42,3 +42,6 @@ app:
       blacklist-token-project-prefix: "blacklist:project:"
       blacklist-token-auth-ttl: 7d
       blacklist-token-auth-prefix: "blacklist:auth:"
+    cookie:
+      project-name: "__Host-project-token"
+      auth-name: "__Host-auth-token"

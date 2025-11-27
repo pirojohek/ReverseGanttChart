@@ -22,10 +22,11 @@ public class FilterBeansConfiguration {
     }
 
     @Bean
-    public LogoutFilter logoutFilter(RedisTokenBlacklistService tokenBlacklistService) {
+    public LogoutFilter logoutFilter(RedisTokenBlacklistService tokenBlacklistService,
+                                     TokenCookieNameProperties tokenCookieNameProperties) {
 
-        var blacklistLogoutHandler = new BlacklistLogoutHandler(tokenBlacklistService);
-        var cleaningJwtCookieLogoutHandler = new CleaningJwtCookiesLogoutHandler();
+        var blacklistLogoutHandler = new BlacklistLogoutHandler(tokenBlacklistService, tokenCookieNameProperties);
+        var cleaningJwtCookieLogoutHandler = new CleaningJwtCookiesLogoutHandler(tokenCookieNameProperties);
         var jwtLogoutSuccessHandler = new JwtLogoutSuccessHandler();
 
         LogoutFilter logoutFilter = new LogoutFilter(jwtLogoutSuccessHandler,
