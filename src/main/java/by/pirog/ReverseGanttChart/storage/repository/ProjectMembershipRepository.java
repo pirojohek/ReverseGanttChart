@@ -18,4 +18,6 @@ public interface ProjectMembershipRepository extends JpaRepository<ProjectMember
             "JOIN FETCH pm.userRole " +
             "WHERE pm.user.email = :email AND pm.project.id = :projectId")
     Optional<ProjectMembershipEntity> findByUserEmailAndProjectId(@Param("email") String email, @Param("projectId") Long projectId);
+
+    List<ProjectMembershipEntity> findAllByProjectId(Long projectId);
 }

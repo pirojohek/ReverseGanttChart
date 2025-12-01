@@ -82,7 +82,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/errors/**").permitAll()
-                                .requestMatchers("/api/project/create").authenticated()
+                                .requestMatchers("/api/project/*").authenticated()
                                 .requestMatchers("/api/project/info/**")
                                     .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.VIEWER.getAuthority()))
                                 .requestMatchers("/api/project/action/**")
@@ -94,6 +94,8 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/task/setReviewerStatus")
                                     .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.REVIEWER.getAuthority()))
                                 .requestMatchers("/api/task/action/**")
+                                    .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.PLANNER.getAuthority()))
+                                .requestMatchers("/api/membership/add")
                                     .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.PLANNER.getAuthority()))
                                 .anyRequest().authenticated());
         http.apply(tokenCookieAuthenticationConfigurer);

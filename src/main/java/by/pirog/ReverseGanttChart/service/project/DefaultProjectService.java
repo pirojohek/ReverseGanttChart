@@ -2,6 +2,7 @@ package by.pirog.ReverseGanttChart.service.project;
 
 import by.pirog.ReverseGanttChart.dto.projectDto.CreateProjectDto;
 import by.pirog.ReverseGanttChart.dto.projectDto.CreatedProjectDto;
+import by.pirog.ReverseGanttChart.exception.DefaultServerException;
 import by.pirog.ReverseGanttChart.security.user.CustomUserDetails;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectEntity;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectMembershipEntity;
@@ -14,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.rmi.UnexpectedException;
+import java.time.Instant;
 
 
 @Service
@@ -36,18 +38,23 @@ public class DefaultProjectService implements ProjectService {
                         .projectName(projectDto.projectName())
                         .projectOwner(customUserDetails.getUser())
                         .projectDescription(projectDto.description())
+                        .createdAt(Instant.now())
+                        .deadline(projectDto.deadline())
                 .build());
 
         ProjectMembershipEntity projectMembershipEntity = projectMembershipRepository.save(ProjectMembershipEntity.builder()
                 .project(project)
                 .user(customUserDetails.getUser())
-                .userRole(projectUserRoleRepository.findProjectUserRoleEntityByRoleName("ROLE_ADMIN"))
+                .userRole(projectUserRoleRepository.findProjectUserRoleEntityByRoleName("ROLE_ADMIN")
+                        .orElseThrow(() -> new DefaultServerException("Something went wrong")))
                 .build());
 
         return CreatedProjectDto.builder()
                 .projectDescription(project.getProjectDescription())
                 .projectName(project.getProjectName())
                 .projectOwnerEmail(project.getProjectOwner().getEmail())
+                .createdAt(project.getCreatedAt())
+                .deadline(project.getDeadline())
                 .build();
     }
 }
