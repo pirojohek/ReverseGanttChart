@@ -2,14 +2,17 @@ package by.pirog.ReverseGanttChart.service.projectMembership;
 
 import by.pirog.ReverseGanttChart.dto.membershipDto.AddProjectMembershipDto;
 import by.pirog.ReverseGanttChart.dto.membershipDto.InfoProjectMembershipDto;
+import by.pirog.ReverseGanttChart.security.enums.UserRole;
 
 import java.util.List;
 
 public interface MembershipService {
 
-    void addMembershipToProjectByEmail(AddProjectMembershipDto addProjectMembershipDto, Long projectId);
+    void addMembershipToProjectByEmail(AddProjectMembershipDto addProjectMembershipDto);
 
-    void removeMembershipFromProjectByEmail(String email, Long projectId);
+    void removeMembershipFromProjectByEmail(String email);
 
-    List<InfoProjectMembershipDto> findAllMembershipByProjectId(Long projectId);
+    List<InfoProjectMembershipDto> findAllMembershipByProjectId();
+
+    void updateProjectMembershipAuthority(String email, UserRole userRole);
 }
