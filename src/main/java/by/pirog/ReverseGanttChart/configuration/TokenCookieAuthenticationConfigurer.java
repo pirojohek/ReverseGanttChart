@@ -4,6 +4,7 @@ import by.pirog.ReverseGanttChart.security.DualCookieAuthenticationConverter;
 import by.pirog.ReverseGanttChart.security.detailsService.TokenUserDetailsService;
 import by.pirog.ReverseGanttChart.security.filter.LoginIntoProjectCookieAuthenticationFilter;
 import by.pirog.ReverseGanttChart.security.filter.LoginUsernamePasswordAuthenticationFilter;
+import by.pirog.ReverseGanttChart.security.provider.DualPreAuthenticatedAuthenticationProvider;
 import by.pirog.ReverseGanttChart.security.securityService.blacklistService.RedisTokenBlacklistService;
 import by.pirog.ReverseGanttChart.security.strategy.TokenCookieSessionAuthenticationStrategy;
 import by.pirog.ReverseGanttChart.security.token.Token;
@@ -48,7 +49,7 @@ public class TokenCookieAuthenticationConfigurer
         usernamePasswordAuthenticationFilter.setSessionAuthenticationStrategy(tokenCookieSessionAuthenticationStrategy);
 
 
-        var authenticationProvider = new PreAuthenticatedAuthenticationProvider();
+        var authenticationProvider = new DualPreAuthenticatedAuthenticationProvider();
         authenticationProvider.setPreAuthenticatedUserDetailsService(
                 new TokenUserDetailsService(userRepository)
         );

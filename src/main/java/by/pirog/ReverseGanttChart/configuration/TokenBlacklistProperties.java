@@ -13,7 +13,7 @@ import java.time.Duration;
 public class TokenBlacklistProperties {
 
     @JsonProperty("blacklist-token-project-prefix")
-    private String blacklistTokenAuthPrefix = "blacklist:project:";
+    private String blacklistTokenAuthPrefix = "blacklist:auth:";
 
     @JsonProperty("blacklist-token-project-prefix")
     private String blacklistTokenProjectPrefix = "blacklist:project:";

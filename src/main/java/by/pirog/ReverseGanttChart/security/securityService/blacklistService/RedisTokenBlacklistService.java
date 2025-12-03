@@ -46,7 +46,6 @@ public class RedisTokenBlacklistService {
 
             boolean blacklisted = exists != null && exists;
 
-
             return blacklisted;
         } catch (Exception e) {
             log.error("Ошибка при проверке токена в blacklist: {}", e.getMessage());

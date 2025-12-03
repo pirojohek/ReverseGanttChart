@@ -36,9 +36,9 @@ public class DualCookieAuthenticationConverter implements AuthenticationConverte
         Authentication projectAuth = extractProjectTokenToAuth(request);
 
 
-        if (authenticationAuth != null && isAuthenticationTokenInBlacklist && projectAuth != null && isProjectTokenInBlacklist) {
+        if (authenticationAuth != null && !isAuthenticationTokenInBlacklist && projectAuth != null && !isProjectTokenInBlacklist) {
             return new DualPreAuthenticatedAuthenticationToken(authenticationAuth, projectAuth);
-        } else if (authenticationAuth != null && isAuthenticationTokenInBlacklist) {
+        } else if (authenticationAuth != null && !isAuthenticationTokenInBlacklist) {
             return new PreAuthenticatedAuthenticationToken
                     (authenticationAuth.getPrincipal(), authenticationAuth.getCredentials(),
                             authenticationAuth.getAuthorities());
@@ -53,7 +53,7 @@ public class DualCookieAuthenticationConverter implements AuthenticationConverte
 
      private boolean checkProjectTokenInBlacklist(HttpServletRequest request) {
         return tokenBlacklistService.isProjectTokenBlacklisted
-                (getCookieValue(request, "__Project-auth-token"));
+                (getCookieValue(request, "__Host-project-token"));
      }
 
     private Authentication extractAuthenticationTokenToAuth(HttpServletRequest request){

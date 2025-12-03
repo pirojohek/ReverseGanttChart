@@ -5,6 +5,7 @@ import by.pirog.ReverseGanttChart.security.detailsService.CustomUserDetailsServi
 import by.pirog.ReverseGanttChart.security.enums.UserRole;
 import by.pirog.ReverseGanttChart.security.factory.AuthorizationManagerFactory;
 import by.pirog.ReverseGanttChart.security.filter.LoginIntoProjectCookieAuthenticationFilter;
+import by.pirog.ReverseGanttChart.security.securityService.authService.ProjectSecurityService;
 import by.pirog.ReverseGanttChart.security.securityService.blacklistService.RedisTokenBlacklistService;
 import by.pirog.ReverseGanttChart.security.securityService.tokenService.TokenService;
 import by.pirog.ReverseGanttChart.security.serializer.TokenCookieJweStringSerializer;
@@ -16,6 +17,7 @@ import com.nimbusds.jose.crypto.DirectEncrypter;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -46,6 +48,7 @@ public class SecurityConfiguration {
         ));
     }
 
+
     @Bean
     public TokenCookieAuthenticationConfigurer tokenCookieAuthenticationConfigurer(
             @Value("${jwt.cookie-token-key}") String jwtCookieTokenKey,
@@ -72,6 +75,8 @@ public class SecurityConfiguration {
                                                    TokenCookieJweStringSerializer tokenCookieJweStringSerializer,
                                                    TokenCookieAuthenticationConfigurer tokenCookieAuthenticationConfigurer) throws Exception {
 
+
+
         http.csrf(csrf -> csrf.disable())
                 .logout(logoutRequest -> logoutRequest.disable())
                 .formLogin(formLogin -> formLogin.disable())
@@ -82,37 +87,26 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests.requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/errors/**").permitAll()
-                                .requestMatchers("/api/project/*").authenticated()
                                 .requestMatchers("/api/project/info/**")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.VIEWER.getAuthority()))
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
                                 .requestMatchers("/api/project/action/**")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.ADMIN.getAuthority()))
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.ADMIN.getAuthority()))
+                                .requestMatchers("/api/project/*").authenticated()
                                 .requestMatchers("/api/task/info/**")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.VIEWER.getAuthority()))
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
                                 .requestMatchers("/api/task/setStudentStatus")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.STUDENT.getAuthority()))
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.STUDENT.getAuthority()))
                                 .requestMatchers("/api/task/setReviewerStatus")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.REVIEWER.getAuthority()))
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.REVIEWER.getAuthority()))
                                 .requestMatchers("/api/task/action/**")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.PLANNER.getAuthority()))
-                                .requestMatchers("/api/membership/add")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithRole(UserRole.PLANNER.getAuthority()))
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))
+                                .requestMatchers("/api/membership/action/**")
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))
+                                .requestMatchers("/api/membership/getAll")
+                                .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
+                                .requestMatchers("/api/membership/me").access(authorizationManagerFactory.hasProjectAccess())
                                 .anyRequest().authenticated());
         http.apply(tokenCookieAuthenticationConfigurer);
         return http.build();
-    }
-
-
-    @Bean
-    public RoleHierarchy roleHierarchy() {
-        String hierarchy = """
-                ROLE_ADMIN > ROLE_PLANNER
-                ROLE_PLANNER > ROLE_REVIEWER
-                ROLE_REVIEWER > ROLE_STUDENT
-                ROLE_STUDENT > ROLE_VIEWER
-                """;
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
-        roleHierarchy.setHierarchy(hierarchy);
-        return roleHierarchy;
     }
 }
