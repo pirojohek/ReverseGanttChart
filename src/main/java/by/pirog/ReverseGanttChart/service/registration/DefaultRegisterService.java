@@ -2,6 +2,7 @@ package by.pirog.ReverseGanttChart.service.registration;
 
 import by.pirog.ReverseGanttChart.dto.RegisteredResponseDto;
 import by.pirog.ReverseGanttChart.dto.RegistrationDto;
+import by.pirog.ReverseGanttChart.exception.EmailAlreadyExists;
 import by.pirog.ReverseGanttChart.storage.entity.UserEntity;
 import by.pirog.ReverseGanttChart.storage.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,7 @@ public class DefaultRegisterService implements RegisterService {
     @Override
     public RegisteredResponseDto register(RegistrationDto registrationDto) {
         if (userRepository.existsByEmail(registrationDto.email())){
-            throw new RuntimeException("Email already exists");
-            // Todo норм ошибку сделать
+            throw new EmailAlreadyExists("User with email " + registrationDto.email()+ " already exists");
         }
 
         userRepository.save(UserEntity.builder()

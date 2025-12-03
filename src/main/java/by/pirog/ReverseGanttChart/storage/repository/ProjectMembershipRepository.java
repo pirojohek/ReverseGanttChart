@@ -20,4 +20,12 @@ public interface ProjectMembershipRepository extends JpaRepository<ProjectMember
     Optional<ProjectMembershipEntity> findByUserEmailAndProjectId(@Param("email") String email, @Param("projectId") Long projectId);
 
     List<ProjectMembershipEntity> findAllByProjectId(Long projectId);
+
+
+    @Query("SELECT pm FROM ProjectMembershipEntity pm " +
+            "JOIN FETCH pm.user " +
+            "JOIN FETCH pm.project " +
+            "JOIN FETCH pm.userRole " +
+            "where pm.user.email = :email")
+    List<ProjectMembershipEntity> findAllByUserEmail(@Param("email") String email);
 }
