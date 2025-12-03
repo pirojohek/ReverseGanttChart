@@ -10,9 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class TokenCookieNameProperties {
 
-    @JsonProperty("project-name")
     private String projectCookieName;
 
-    @JsonProperty("auth-name")
     private String authCookieName;
 }

@@ -12,15 +12,11 @@ import java.time.Duration;
 @Data
 public class TokenBlacklistProperties {
 
-    @JsonProperty("blacklist-token-project-prefix")
     private String blacklistTokenAuthPrefix = "blacklist:auth:";
 
-    @JsonProperty("blacklist-token-project-prefix")
     private String blacklistTokenProjectPrefix = "blacklist:project:";
 
-    @JsonProperty("blacklist-token-project-ttl")
     private Duration blacklistTokenProjectTtl = Duration.ofHours(1);
 
-    @JsonProperty("blacklist-token-auth-ttl")
     private Duration blacklistTokenAuthTtl = Duration.ofHours(1);
 }
