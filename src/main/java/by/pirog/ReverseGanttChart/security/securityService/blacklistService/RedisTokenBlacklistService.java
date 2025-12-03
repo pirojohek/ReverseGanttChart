@@ -1,9 +1,11 @@
 package by.pirog.ReverseGanttChart.security.securityService.blacklistService;
 
 import by.pirog.ReverseGanttChart.configuration.TokenBlacklistProperties;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +31,7 @@ public class RedisTokenBlacklistService {
             redisTemplate.opsForValue().set(
                     tokenKey,
                     tokenBlacklistInfo,
-                    tokenBlacklistProperties.getBlacklistTokenProjectTtl()
+                    tokenBlacklistProperties.getBlacklistTokenAuthTtl()
             );
 
             log.info(" Токен добавлен в blacklist. Ключ: {}",

@@ -48,11 +48,13 @@ public class TokenCookieAuthenticationConfigurer
         usernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager);
         usernamePasswordAuthenticationFilter.setSessionAuthenticationStrategy(tokenCookieSessionAuthenticationStrategy);
 
-
-        var authenticationProvider = new DualPreAuthenticatedAuthenticationProvider();
-        authenticationProvider.setPreAuthenticatedUserDetailsService(
+        var delegateAuthenticationProvider = new PreAuthenticatedAuthenticationProvider();
+        delegateAuthenticationProvider.setPreAuthenticatedUserDetailsService(
                 new TokenUserDetailsService(userRepository)
         );
+        var authenticationProvider = new DualPreAuthenticatedAuthenticationProvider()
+                .preAuthenticatedAuthenticationProvider(new TokenUserDetailsService(userRepository))
+                .delegateAuthenticationProvider(delegateAuthenticationProvider);
 
         var cookieAuthenticationFilter = getAuthenticationFilter(authenticationManager);
 

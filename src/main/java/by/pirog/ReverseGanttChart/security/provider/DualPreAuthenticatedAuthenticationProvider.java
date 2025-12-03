@@ -1,8 +1,7 @@
 package by.pirog.ReverseGanttChart.security.provider;
 
 import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
-import org.springframework.core.log.LogMessage;
-import org.springframework.security.authentication.BadCredentialsException;
+import lombok.Setter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
@@ -14,13 +13,15 @@ public class DualPreAuthenticatedAuthenticationProvider extends PreAuthenticated
 
     private AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> preAuthenticatedUserDetailsService;
 
+    private PreAuthenticatedAuthenticationProvider delegateAuthenticationProvider;
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         if (!supports(authentication.getClass())) {
             return null;
         }
-        if (!(authentication instanceof DualPreAuthenticatedAuthenticationToken)){
-            return super.authenticate(authentication);
+        if (!(authentication instanceof DualPreAuthenticatedAuthenticationToken)) {
+            return delegateAuthenticationProvider.authenticate(authentication);
         }
         if (authentication.getPrincipal() == null) {
             return null;
@@ -37,9 +38,16 @@ public class DualPreAuthenticatedAuthenticationProvider extends PreAuthenticated
         return token;
     }
 
-    public void setPreAuthenticatedUserDetailsService(
-            AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken> uds) {
-        this.preAuthenticatedUserDetailsService = uds;
+    public DualPreAuthenticatedAuthenticationProvider delegateAuthenticationProvider
+            (PreAuthenticatedAuthenticationProvider delegateAuthenticationProvider) {
+        this.delegateAuthenticationProvider = delegateAuthenticationProvider;
+        return this;
     }
 
+    public DualPreAuthenticatedAuthenticationProvider preAuthenticatedAuthenticationProvider
+            (AuthenticationUserDetailsService<PreAuthenticatedAuthenticationToken>
+                     preAuthenticatedUserDetailsService) {
+        this.preAuthenticatedUserDetailsService = preAuthenticatedUserDetailsService;
+        return this;
+    }
 }
