@@ -20,7 +20,7 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/action/create")
+    @PostMapping("/create")
     public ResponseEntity<CreatedProjectDto> createProject(@RequestBody CreateProjectDto createProjectDto) {
 
         return ResponseEntity.ok(projectService.createProject(createProjectDto));

@@ -19,11 +19,12 @@ import java.rmi.UnexpectedException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Optional;
 
 
 @Service
 @RequiredArgsConstructor
-public class DefaultProjectService implements ProjectService {
+public class DefaultProjectService implements ProjectService, ProjectEntityService {
 
     private final ProjectRepository projectRepository;
 
@@ -111,5 +112,10 @@ public class DefaultProjectService implements ProjectService {
                 .createdAt(project.getCreatedAtAsLocalDate())
                 .updatedAt(project.getUpdatedAtAsLocalDate())
                 .build();
+    }
+
+    @Override
+    public Optional<ProjectEntity> findProjectById(Long id) {
+        return this.projectRepository.findProjectById(id);
     }
 }
