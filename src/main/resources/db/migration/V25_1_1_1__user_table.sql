@@ -78,6 +78,8 @@ CREATE TABLE storage.t_project_component
     c_description                 TEXT,
     c_project_id                  INTEGER      NOT NULL REFERENCES storage.t_project (c_id),
     c_project_component_parent_id INTEGER      NOT NULL REFERENCES storage.t_project_component (c_id),
+    c_deadline                    TIMESTAMP    NOT NULL,
+    c_creator_id                  INTEGER REFERENCES storage.t_project_membership (c_id),
     с_created_at                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     c_pos                         INTEGER
 );
