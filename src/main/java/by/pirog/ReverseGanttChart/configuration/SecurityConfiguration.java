@@ -21,6 +21,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authorization.AuthorizationManager;
@@ -104,10 +106,16 @@ public class SecurityConfiguration {
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
                                 .requestMatchers("/api/projectComponent/*")
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
-
                                 .requestMatchers("/api/taskMakers/**")
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.REVIEWER.getAuthority()))
-                                .anyRequest().authenticated());
+                                .anyRequest().authenticated())
+                                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint((request, response, authException) -> {
+                                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                                    response.getWriter().write(
+                                            "{\"error\": \"Authentication required\"}"
+                                    );
+                                }));
         http.apply(tokenCookieAuthenticationConfigurer);
         return http.build();
     }
