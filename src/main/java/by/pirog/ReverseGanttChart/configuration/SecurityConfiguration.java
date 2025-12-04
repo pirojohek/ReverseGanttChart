@@ -92,19 +92,21 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/project/action/**")
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.ADMIN.getAuthority()))
                                 .requestMatchers("/api/project/*").authenticated()
-                                .requestMatchers("/api/task/info/**")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
-                                .requestMatchers("/api/task/setStudentStatus")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.STUDENT.getAuthority()))
-                                .requestMatchers("/api/task/setReviewerStatus")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.REVIEWER.getAuthority()))
-                                .requestMatchers("/api/task/action/**")
-                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))
                                 .requestMatchers("/api/membership/action/**")
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))
                                 .requestMatchers("/api/membership/getAll")
-                                .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
                                 .requestMatchers("/api/membership/me").access(authorizationManagerFactory.hasProjectAccess())
+
+                                .requestMatchers("/api/projectComponent/action/**")
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))
+                                .requestMatchers("/api/projectComponent")
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
+                                .requestMatchers("/api/projectComponent/*")
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
+
+                                .requestMatchers("/api/taskMakers/**")
+                                    .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.REVIEWER.getAuthority()))
                                 .anyRequest().authenticated());
         http.apply(tokenCookieAuthenticationConfigurer);
         return http.build();

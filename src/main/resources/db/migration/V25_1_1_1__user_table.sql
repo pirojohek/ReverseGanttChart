@@ -43,6 +43,7 @@ INSERT INTO storage.t_project_user_role (c_role_name)
 VALUES ('ROLE_ADMIN'),
        ('ROLE_VIEWER'),
        ('ROLE_REVIEWER'),
+       ("ROLE_PLANNER"),
        ('ROLE_STUDENT');
 
 CREATE TABLE storage.t_task_status

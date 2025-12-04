@@ -40,7 +40,7 @@ public class MembershipController {
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<InfoProjectMembershipDto>> getAllProjectMemberships() {
+    public ResponseEntity<List<InfoProjectMembershipDto>> getAllProjectMembershipsInProject() {
         List<InfoProjectMembershipDto> response = this.membershipService.findAllMembershipByProjectId();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

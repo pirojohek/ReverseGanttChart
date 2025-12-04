@@ -55,7 +55,7 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
                 .orElseThrow(() -> new ProjectNotFoundException("Project with id " + token.getProjectId() + " not found"));
         // Todo обработать ошибку
         ProjectUserRoleEntity userRole = projectUserRoleRepository
-                .findProjectUserRoleEntityByRoleName(dto.userRole().getAuthority())
+                .findProjectUserRoleEntityByRoleName(dto.userRole())
                 .orElseThrow(() -> new RoleNotFoundException("Role with name " + dto.userRole() + " not found"));
 
         ProjectMembershipEntity projectMembershipEntity = ProjectMembershipEntity.builder()
