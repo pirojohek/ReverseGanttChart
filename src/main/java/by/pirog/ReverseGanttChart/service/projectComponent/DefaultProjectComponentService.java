@@ -85,7 +85,7 @@ public class DefaultProjectComponentService implements ProjectComponentService{
     }
 
     @Override
-    public ProjectComponentResponseDto getProjectComponentById(Long componentId) {
+    public ProjectComponentResponseDto getProjectComponentByIdWithoutHierarchy(Long componentId) {
 
         var token = (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
@@ -99,6 +99,11 @@ public class DefaultProjectComponentService implements ProjectComponentService{
     @Override
     public ProjectComponentResponseDto getProjectComponentByProjectIdWithHierarchy(Long componentId) {
         return null;
+    }
+
+    @Override
+    public List<ProjectComponentResponseDto> getProjectComponentsByProjectIdWithHierarchyOrderedByDate() {
+        return List.of();
     }
 
     private ProjectComponentResponseDto getProjectComponentAsDto(ProjectComponentEntity entity) {

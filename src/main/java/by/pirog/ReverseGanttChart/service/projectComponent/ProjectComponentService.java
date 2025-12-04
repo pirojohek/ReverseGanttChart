@@ -10,9 +10,9 @@ import java.util.List;
 public interface ProjectComponentService {
     CreatedProjectComponentDto createProjectComponent(CreateProjectComponentDto createProjectComponentDto);
 
-    ProjectComponentResponseDto getProjectComponentById(Long componentId);
+    ProjectComponentResponseDto getProjectComponentByIdWithoutHierarchy(Long componentId);
 
     ProjectComponentResponseDto getProjectComponentByProjectIdWithHierarchy(Long componentId);
 
-
+    List<ProjectComponentResponseDto> getProjectComponentsByProjectIdWithHierarchyOrderedByDate();
 }

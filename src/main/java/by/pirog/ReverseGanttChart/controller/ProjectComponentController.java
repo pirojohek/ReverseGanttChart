@@ -32,14 +32,10 @@ public class ProjectComponentController {
     }
 
     @GetMapping
-    public ResponseEntity<ProjectComponentResponseDto> getProjectComponentById(@RequestParam(name = "componentId") Long componentId){
-        ProjectComponentResponseDto response = this.projectComponentService.getProjectComponentById(componentId);
+    public ResponseEntity<ProjectComponentResponseDto> getProjectComponentByIdWithoutHierarchy(@RequestParam(name = "componentId") Long componentId){
+        ProjectComponentResponseDto response = this.projectComponentService.getProjectComponentByIdWithoutHierarchy(componentId);
         return ResponseEntity.ok(response);
     }
-//
-//    @GetMapping("/all")
-//    public ResponseEntity<List<ProjectComponentResponseDto>> getAllProjectComponents(){
-//
-//    }
+
 
 }
