@@ -16,10 +16,10 @@ import java.util.Map;
 @RequestMapping("api/user")
 public class UserController {
 
-    @GetMapping
+    @GetMapping("/me")
     public ResponseEntity<?> getUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+        // Todo вот это по хорошему нужно переделать
         if (authentication instanceof PreAuthenticatedAuthenticationToken) {
             Token yourToken = (Token) authentication.getCredentials();
 

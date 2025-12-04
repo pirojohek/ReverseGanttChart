@@ -5,12 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-public class InfoProjectMembershipDto {
+@AllArgsConstructor
+public class ResponseUserMembershipMeDto {
     private String email;
-    private String userRole;
     private Long projectId;
+    private String role;
 }

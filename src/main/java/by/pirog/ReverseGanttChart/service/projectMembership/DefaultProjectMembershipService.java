@@ -2,9 +2,13 @@ package by.pirog.ReverseGanttChart.service.projectMembership;
 
 import by.pirog.ReverseGanttChart.dto.membershipDto.AddProjectMembershipDto;
 import by.pirog.ReverseGanttChart.dto.membershipDto.InfoProjectMembershipDto;
+import by.pirog.ReverseGanttChart.dto.membershipDto.ResponseUserMembershipMeDto;
 import by.pirog.ReverseGanttChart.exception.*;
 import by.pirog.ReverseGanttChart.security.enums.UserRole;
 import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
+import by.pirog.ReverseGanttChart.security.user.CustomUserDetails;
+import by.pirog.ReverseGanttChart.service.project.ProjectEntityService;
+import by.pirog.ReverseGanttChart.service.user.UserService;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectEntity;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectMembershipEntity;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectUserRoleEntity;
@@ -24,9 +28,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DefaultProjectMembershipService implements GetProjectMembershipByUserEmailAndProjectId, MembershipService {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final ProjectEntityService projectService;
+
     private final ProjectMembershipRepository projectMembershipRepository;
-    private final ProjectRepository projectRepository;
     private final ProjectUserRoleRepository projectUserRoleRepository;
 
     @Override
@@ -43,10 +48,10 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
         var token =
                 (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        UserEntity userEntity = userRepository.findByEmail(dto.email())
+        UserEntity userEntity = userService.findUserByEmail(dto.email())
                 .orElseThrow(() -> new UserNotFoundException("User with email " + dto.email() + " not found"));
         // Todo обработать ошибку
-        ProjectEntity projectEntity = projectRepository.findById(token.getProjectId())
+        ProjectEntity projectEntity = projectService.findProjectById(token.getProjectId())
                 .orElseThrow(() -> new ProjectNotFoundException("Project with id " + token.getProjectId() + " not found"));
         // Todo обработать ошибку
         ProjectUserRoleEntity userRole = projectUserRoleRepository
@@ -85,6 +90,7 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
         return projectMembershipEntities.stream().map(entity -> InfoProjectMembershipDto.builder()
                 .email(entity.getUser().getEmail())
                 .userRole(entity.getUserRole().getRoleName())
+                .projectId(entity.getProject().getId())
                 .build()).toList();
     }
 
@@ -102,4 +108,46 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
         projectMembership.setUserRole(role);
         this.projectMembershipRepository.save(projectMembership);
     }
+
+    @Override
+    public ResponseUserMembershipMeDto getInfoAboutCurrentMembership() {
+        var token = (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        ProjectMembershipEntity entity = findProjectMembershipByUserEmailAndProjectId(user.getEmail(), token.getProjectId())
+                .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + user.getEmail() + " not found"));
+
+
+        return ResponseUserMembershipMeDto.builder()
+                .email(user.getEmail())
+                .projectId(token.getProjectId())
+                .role(entity.getUserRole().getRoleName())
+                .build();
+
+    }
+
+    @Override
+    public List<ResponseUserMembershipMeDto> getAllUserMemberships() {
+
+        var userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        List<ProjectMembershipEntity> projectMemberships = this.projectMembershipRepository
+                .findAllByUserEmail(userDetails.getEmail());
+
+        return projectMemberships.stream().map(entity -> ResponseUserMembershipMeDto.builder()
+                .email(entity.getUser().getEmail())
+                .projectId(entity.getProject().getId())
+                 .role(entity.getUserRole().getRoleName())
+                        .build()).toList();
+    }
+
+    @Override
+    public ProjectMembershipEntity getCurrentProjectMembership() {
+        var token = (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return findProjectMembershipByUserEmailAndProjectId(user.getEmail(), token.getProjectId())
+                .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + user.getEmail() + " not found"));
+    }
+
 }

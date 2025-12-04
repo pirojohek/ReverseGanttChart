@@ -2,6 +2,7 @@ package by.pirog.ReverseGanttChart.controller;
 
 import by.pirog.ReverseGanttChart.dto.membershipDto.AddProjectMembershipDto;
 import by.pirog.ReverseGanttChart.dto.membershipDto.InfoProjectMembershipDto;
+import by.pirog.ReverseGanttChart.dto.membershipDto.ResponseUserMembershipMeDto;
 import by.pirog.ReverseGanttChart.security.enums.UserRole;
 import by.pirog.ReverseGanttChart.service.projectMembership.MembershipService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MembershipController {
     private final MembershipService membershipService;
+
+    @GetMapping("/me")
+    public ResponseEntity<ResponseUserMembershipMeDto> userMembershipMe(){
+        ResponseUserMembershipMeDto response = this.membershipService.getInfoAboutCurrentMembership();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ResponseUserMembershipMeDto>> getAllUserMemberships(){
+        List<ResponseUserMembershipMeDto> response = this.membershipService.getAllUserMemberships();
+
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/action/add")
     public ResponseEntity<Void> addProjectMembership(@RequestBody AddProjectMembershipDto projectMembershipDto) {

@@ -10,11 +10,22 @@ import java.util.Optional;
 public interface ProjectComponentRepository extends JpaRepository<ProjectComponentEntity, Long> {
 
     @Query("SELECT pc FROM ProjectComponentEntity pc " +
-            "JOIN FETCH pc.projectComponentParent " +
-            "JOIN FETCH pc.projectComponentChildren " +
+            "LEFT JOIN FETCH pc.projectComponentParent " +
+            "LEFT JOIN FETCH pc.projectComponentChildren children " +
             "JOIN FETCH pc.project " +
+            "LEFT JOIN pc.taskMakers " +
+            "LEFT JOIN children.taskMakers " +
             "WHERE pc.projectComponentParent.id = :componentId AND " +
             "pc.project.id = :projectId")
-    Optional<ProjectComponentEntity> findProjectComponentEntityByParentIdAndProjectId
+    Optional<ProjectComponentEntity> findProjectComponentEntityByProjectIdAndComponentIdWithTaskMakers
             (@Param("componentId") Long componentId, @Param("projectId") Long projectId);
+
+    @Query("SELECT pc FROM ProjectComponentEntity pc " +
+            "LEFT JOIN FETCH pc.projectComponentChildren " +
+            "JOIN FETCH pc.project " +
+            "WHERE pc.project.id = :projectId AND pc.id = :componentId")
+    Optional<ProjectComponentEntity> findProjectComponentEntityByProjectIdAndComponentId
+            (@Param("projectId") Long projectId, @Param("componentId") Long componentId);
+
+
 }
