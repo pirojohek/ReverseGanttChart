@@ -13,4 +13,8 @@ public class ResponseUserMembershipMeDto {
     private String email;
     private Long projectId;
     private String role;
+
+    private String projectName;
+
+    private String projectDescription;
 }

@@ -24,6 +24,7 @@ public class MembershipController {
         return ResponseEntity.ok(response);
     }
 
+    // Возвращает все проекты, в которых участвует пользователь
     @GetMapping
     public ResponseEntity<List<ResponseUserMembershipMeDto>> getAllUserMemberships(){
         List<ResponseUserMembershipMeDto> response = this.membershipService.getAllUserMemberships();

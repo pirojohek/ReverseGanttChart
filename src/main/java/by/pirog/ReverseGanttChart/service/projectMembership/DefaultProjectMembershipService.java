@@ -137,7 +137,9 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
         return projectMemberships.stream().map(entity -> ResponseUserMembershipMeDto.builder()
                 .email(entity.getUser().getEmail())
                 .projectId(entity.getProject().getId())
-                 .role(entity.getUserRole().getRoleName())
+                .role(entity.getUserRole().getRoleName())
+                .projectDescription(entity.getProject().getProjectDescription())
+                .projectName(entity.getProject().getProjectName())
                         .build()).toList();
     }
 
