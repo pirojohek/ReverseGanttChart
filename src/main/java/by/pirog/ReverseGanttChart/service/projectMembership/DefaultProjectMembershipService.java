@@ -152,4 +152,12 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
                 .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + user.getEmail() + " not found"));
     }
 
+    @Override
+    public ProjectMembershipEntity getProjectMembershipByEmail(String email) {
+        var token = (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+        return this.projectMembershipRepository.findByUserEmailAndProjectId(email, token.getProjectId())
+                .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + email + " not found"));
+    }
+
 }

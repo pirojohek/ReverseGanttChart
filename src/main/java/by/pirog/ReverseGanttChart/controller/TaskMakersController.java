@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,4 +27,16 @@ public class TaskMakersController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/setMaker")
+    public ResponseEntity<List<TakenTaskResponseDto>> giveMembershipTasksToMake(@RequestParam("email") String email,
+                                                                                @RequestParam("taskId") Long taskId,
+                                                                                @RequestParam("subtasks") Boolean subtasks){
+        List<TakenTaskResponseDto> response = this.taskMakersService.giveMembershipTasksToMake(email, taskId, subtasks);
+
+        return ResponseEntity.ok(response);
+
+    }
+
+    // Todo нужно еще добавить изменение исполняющего задачу, то есть его удалить ну тут уже без рекурсии
 }

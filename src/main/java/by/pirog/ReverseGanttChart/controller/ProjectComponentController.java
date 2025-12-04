@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/projectComponent")
@@ -32,8 +34,12 @@ public class ProjectComponentController {
     @GetMapping
     public ResponseEntity<ProjectComponentResponseDto> getProjectComponentById(@RequestParam(name = "componentId") Long componentId){
         ProjectComponentResponseDto response = this.projectComponentService.getProjectComponentById(componentId);
-
         return ResponseEntity.ok(response);
     }
+//
+//    @GetMapping("/all")
+//    public ResponseEntity<List<ProjectComponentResponseDto>> getAllProjectComponents(){
+//
+//    }
 
 }

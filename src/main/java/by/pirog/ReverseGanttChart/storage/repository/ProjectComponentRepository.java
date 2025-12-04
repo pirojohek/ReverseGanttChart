@@ -27,5 +27,17 @@ public interface ProjectComponentRepository extends JpaRepository<ProjectCompone
     Optional<ProjectComponentEntity> findProjectComponentEntityByProjectIdAndComponentId
             (@Param("projectId") Long projectId, @Param("componentId") Long componentId);
 
+    @Query("SELECT pc FROM ProjectComponentEntity pc " +
+            "LEFT JOIN FETCH pc.projectComponentChildren " +
+            "LEFT JOIN FETCH pc.project " +
+            "LEFT JOIN FETCH pc.projectComponentParent " +
+            "LEFT JOIN FETCH pc.comments " +
+            "LEFT JOIN FETCH pc.creator " +
+            "LEFT JOIN FETCH pc.reviewerTaskStatus " +
+            "LEFT JOIN FETCH pc.studentTaskStatus " +
+            "LEFT JOIN FETCH pc.taskMakers " +
+            "WHERE pc.project.id = :projectId AND pc.id = :componentId")
+    Optional<ProjectComponentEntity>
+            findProjectComponentEntityByProjectIdAndComponentIdWithAllProperties(@Param("projectId") Long projectId, @Param("componentId") Long componentId);
 
 }

@@ -23,4 +23,6 @@ public interface MembershipService {
     List<ResponseUserMembershipMeDto> getAllUserMemberships();
 
     ProjectMembershipEntity getCurrentProjectMembership();
+
+    ProjectMembershipEntity getProjectMembershipByEmail(String email);
 }
