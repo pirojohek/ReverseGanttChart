@@ -81,7 +81,8 @@ public class SecurityConfiguration {
         configuration.setExposedHeaders(Arrays.asList(
                 "Authorization",
                 "Content-Disposition",
-                "Set-Cookie"
+                "Set-Cookie",
+                "Set-Cookie2"
         ));
 
         configuration.setAllowCredentials(true);
