@@ -100,9 +100,10 @@ public class SecurityConfiguration {
             TokenService tokenService,
             LoginIntoProjectCookieAuthenticationFilter loginIntoProjectCookieAuthenticationFilter,
             LogoutFilter logoutFilter,
-            RedisTokenBlacklistService redisTokenBlacklistService
+            RedisTokenBlacklistService redisTokenBlacklistService,
+            TokenCookieNameProperties tokenCookieNameProperties
     ) throws Exception {
-        return new TokenCookieAuthenticationConfigurer(objectMapper, userRepository)
+        return new TokenCookieAuthenticationConfigurer(objectMapper, userRepository, tokenCookieNameProperties)
                 .tokenCookieStringDeserializer(
                         new TokenCookieJweStringDeserializer(new DirectDecrypter(
                                 OctetSequenceKey.parse(jwtCookieTokenKey)

@@ -21,11 +21,11 @@ public class CommentEntity {
     @Column(name = "c_comment")
     private String comment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_commenter")
     private ProjectMembershipEntity commenter;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_project_component_id")
     private ProjectComponentEntity projectComponent;
 

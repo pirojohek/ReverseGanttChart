@@ -43,6 +43,7 @@ public class RedisTokenBlacklistService {
 
     public boolean isAuthTokenBlacklisted(String token){
         try {
+            if(token == null) return false;
             String tokenKey = getAuthTokenKey(token);
             Boolean exists = redisTemplate.hasKey(tokenKey);
 
@@ -79,7 +80,9 @@ public class RedisTokenBlacklistService {
 
     public boolean isProjectTokenBlacklisted(String token){
         try {
+            if (token == null) return false;
             String tokenKey = getProjectTokenKey(token);
+
             Boolean exists = redisTemplate.hasKey(tokenKey);
 
             boolean blacklisted = exists != null && exists;
@@ -93,7 +96,9 @@ public class RedisTokenBlacklistService {
 
 
     private String getProjectTokenKey(String token) {
+
         String tokenHash = DigestUtils.sha256Hex(token);
+
         return tokenBlacklistProperties.getBlacklistTokenProjectPrefix() + tokenHash;
     }
 

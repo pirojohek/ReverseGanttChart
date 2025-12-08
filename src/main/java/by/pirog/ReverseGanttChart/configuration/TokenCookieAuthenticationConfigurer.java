@@ -26,7 +26,7 @@ public class TokenCookieAuthenticationConfigurer
         extends AbstractHttpConfigurer<TokenCookieAuthenticationConfigurer, HttpSecurity> {
 
     private final ObjectMapper objectMapper;
-    Function<String, Token> tokenCookieStringDeserializer;
+    private Function<String, Token> tokenCookieStringDeserializer;
     private final UserRepository userRepository;
     private TokenCookieSessionAuthenticationStrategy tokenCookieSessionAuthenticationStrategy;
 
@@ -35,9 +35,12 @@ public class TokenCookieAuthenticationConfigurer
 
     private RedisTokenBlacklistService redisTokenBlacklistService;
 
-    public TokenCookieAuthenticationConfigurer(ObjectMapper objectMapper, UserRepository userRepository) {
+    private final TokenCookieNameProperties tokenCookieNameProperties;
+    public TokenCookieAuthenticationConfigurer(ObjectMapper objectMapper, UserRepository userRepository
+    ,TokenCookieNameProperties tokenCookieNameProperties) {
         this.objectMapper = objectMapper;
         this.userRepository = userRepository;
+        this.tokenCookieNameProperties = tokenCookieNameProperties;
     }
 
     @Override
@@ -69,7 +72,7 @@ public class TokenCookieAuthenticationConfigurer
     private AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) {
         var cookieAuthenticationFilter = new AuthenticationFilter(
                 authenticationManager,
-                new DualCookieAuthenticationConverter(this.tokenCookieStringDeserializer, redisTokenBlacklistService)
+                new DualCookieAuthenticationConverter(this.tokenCookieStringDeserializer, redisTokenBlacklistService, tokenCookieNameProperties)
         );
 
         cookieAuthenticationFilter.setSuccessHandler((request, response, auth) -> {

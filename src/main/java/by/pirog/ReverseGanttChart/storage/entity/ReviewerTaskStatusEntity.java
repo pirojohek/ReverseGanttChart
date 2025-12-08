@@ -16,15 +16,15 @@ public class ReviewerTaskStatusEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_reviewer_id")
     private ProjectMembershipEntity projectMembership;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_project_component_id")
     private ProjectComponentEntity task;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_task_status_id")
     private TaskStatusEntity taskStatus;
 

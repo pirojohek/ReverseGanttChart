@@ -45,7 +45,7 @@ public class DefaultProjectComponentService implements ProjectComponentService{
 
         var token = (DualPreAuthenticatedAuthenticationToken) authentication;
 
-        var customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        var customUserDetails = (CustomUserDetails) authentication.getDetails();
 
         ProjectMembershipEntity creator =
                 getProjectMembershipByUserEmailAndProjectId.findProjectMembershipByUserEmailAndProjectId(customUserDetails.getEmail(), token.getProjectId())

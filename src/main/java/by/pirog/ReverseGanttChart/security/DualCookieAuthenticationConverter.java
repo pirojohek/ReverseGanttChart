@@ -1,5 +1,6 @@
 package by.pirog.ReverseGanttChart.security;
 
+import by.pirog.ReverseGanttChart.configuration.TokenCookieNameProperties;
 import by.pirog.ReverseGanttChart.security.securityService.blacklistService.RedisTokenBlacklistService;
 import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
 import by.pirog.ReverseGanttChart.security.token.Token;
@@ -21,14 +22,18 @@ public class DualCookieAuthenticationConverter implements AuthenticationConverte
 
     private final RedisTokenBlacklistService tokenBlacklistService;
 
-    public DualCookieAuthenticationConverter(Function<String, Token> tokenCookieStringDeserializer, RedisTokenBlacklistService tokenBlacklistService) {
+    private final TokenCookieNameProperties tokenCookieNameProperties;
+
+    public DualCookieAuthenticationConverter(Function<String, Token> tokenCookieStringDeserializer,
+                                             RedisTokenBlacklistService tokenBlacklistService,
+                                             TokenCookieNameProperties tokenCookieNameProperties) {
         this.tokenCookieStringDeserializer = tokenCookieStringDeserializer;
         this.tokenBlacklistService = tokenBlacklistService;
+        this.tokenCookieNameProperties = tokenCookieNameProperties;
     }
 
     @Override
     public Authentication convert(HttpServletRequest request) {
-
         boolean isAuthenticationTokenInBlacklist = checkAuthenticationTokenInBlacklist(request);
         boolean isProjectTokenInBlacklist = checkProjectTokenInBlacklist(request);
 
@@ -48,16 +53,16 @@ public class DualCookieAuthenticationConverter implements AuthenticationConverte
 
      private boolean checkAuthenticationTokenInBlacklist(HttpServletRequest request) {
         return tokenBlacklistService.isAuthTokenBlacklisted
-                (getCookieValue(request, "__Host-auth-token"));
+                (getCookieValue(request, tokenCookieNameProperties.getAuthCookieName()));
      }
 
      private boolean checkProjectTokenInBlacklist(HttpServletRequest request) {
         return tokenBlacklistService.isProjectTokenBlacklisted
-                (getCookieValue(request, "__Host-project-token"));
+                (getCookieValue(request, tokenCookieNameProperties.getProjectCookieName()));
      }
 
     private Authentication extractAuthenticationTokenToAuth(HttpServletRequest request){
-        String tokenString = getCookieValue(request, "__Host-auth-token");
+        String tokenString = getCookieValue(request, tokenCookieNameProperties.getAuthCookieName());
         if (tokenString != null){
             var token =  tokenCookieStringDeserializer.apply(tokenString);
             return createAuthenticationToken(token);
@@ -66,7 +71,7 @@ public class DualCookieAuthenticationConverter implements AuthenticationConverte
     }
 
     private Authentication extractProjectTokenToAuth(HttpServletRequest request){
-        String tokenString = getCookieValue(request, "__Host-project-token");
+        String tokenString = getCookieValue(request, tokenCookieNameProperties.getProjectCookieName());
         if (tokenString != null){
             var token =  tokenCookieStringDeserializer.apply(tokenString);
             return createAuthenticationToken(token);

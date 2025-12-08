@@ -31,10 +31,10 @@ public class DualPreAuthenticatedAuthenticationProvider extends PreAuthenticated
         }
         UserDetails userDetails = this.preAuthenticatedUserDetailsService
                 .loadUserDetails((PreAuthenticatedAuthenticationToken) authentication);
+
         var token = (DualPreAuthenticatedAuthenticationToken) authentication;
         token.setDetails(userDetails);
         token.setAuthenticated(true);
-
         return token;
     }
 

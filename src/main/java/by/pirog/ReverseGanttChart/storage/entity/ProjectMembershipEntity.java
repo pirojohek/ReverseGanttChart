@@ -16,15 +16,15 @@ public class ProjectMembershipEntity {
     @Column(name = "c_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_user_role")
     private ProjectUserRoleEntity userRole;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_project")
     private ProjectEntity project;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="c_user")
     private UserEntity user;
 }

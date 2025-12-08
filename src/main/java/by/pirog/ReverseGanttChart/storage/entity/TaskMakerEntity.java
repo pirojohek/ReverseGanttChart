@@ -16,11 +16,11 @@ public class TaskMakerEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_membership_id")
     private ProjectMembershipEntity membership;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_project_component_id")
     private ProjectComponentEntity projectComponent;
 }

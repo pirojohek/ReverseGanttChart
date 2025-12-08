@@ -36,7 +36,7 @@ public class ProjectEntity {
     @Column(name = "c_updated_at")
     private Instant updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_project_owner")
     private UserEntity projectOwner;
 

@@ -29,16 +29,17 @@ public class ProjectComponentEntity {
     @Column(name = "c_description")
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_project_id")
     private ProjectEntity project;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_project_component_parent_id")
     private ProjectComponentEntity projectComponentParent;
 
     @OneToMany(mappedBy = "projectComponentParent", cascade = CascadeType.ALL)
     @BatchSize(size = 20)
+    @OrderBy("createdAt ASC")
     private List<ProjectComponentEntity> projectComponentChildren;
 
     @Column(name = "c_created_at")
@@ -50,7 +51,7 @@ public class ProjectComponentEntity {
     @Column(name = "c_deadline")
     private Instant deadline;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_creator_id")
     private ProjectMembershipEntity creator;
 

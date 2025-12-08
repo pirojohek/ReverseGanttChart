@@ -37,5 +37,4 @@ public class ProjectComponentController {
         return ResponseEntity.ok(response);
     }
 
-
 }

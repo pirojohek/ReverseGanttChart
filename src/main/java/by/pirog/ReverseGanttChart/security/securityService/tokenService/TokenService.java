@@ -1,5 +1,6 @@
 package by.pirog.ReverseGanttChart.security.securityService.tokenService;
 
+import by.pirog.ReverseGanttChart.configuration.TokenCookieNameProperties;
 import by.pirog.ReverseGanttChart.security.factory.AuthenticationTokenCookieFactory;
 import by.pirog.ReverseGanttChart.security.factory.ProjectTokenCookieFactory;
 
@@ -23,8 +24,11 @@ public class TokenService implements ResponseCookieProjectToken, ResponseCookieU
 
     Function<ProjectMembershipEntity, Token> projectTokenFactory = new ProjectTokenCookieFactory();
 
-    public TokenService(Function<Token, String> tokenStringSerializer) {
+    private final TokenCookieNameProperties tokenCookieNameProperties;
+
+    public TokenService(Function<Token, String> tokenStringSerializer, TokenCookieNameProperties tokenCookieNameProperties) {
         this.tokenStringSerializer = tokenStringSerializer;
+        this.tokenCookieNameProperties = tokenCookieNameProperties;
     }
 
     @Override
@@ -32,7 +36,7 @@ public class TokenService implements ResponseCookieProjectToken, ResponseCookieU
         var projectTokenCookie = this.projectTokenFactory.apply(projectMembershipEntity);
         var projectTokenSerialized = this.tokenStringSerializer.apply(projectTokenCookie);
 
-        return ResponseCookie.from("__Host-project-token", projectTokenSerialized)
+        return ResponseCookie.from(tokenCookieNameProperties.getProjectCookieName(), projectTokenSerialized)
                 .httpOnly(true)
                 .path("/")
                 .maxAge((int) ChronoUnit.SECONDS.between(Instant.now(), projectTokenCookie.expiresAt()))
@@ -45,7 +49,7 @@ public class TokenService implements ResponseCookieProjectToken, ResponseCookieU
         var authenticationToken = this.authenticationTokenFactory.apply(authentication);
         var authenticationTokenSerialized = this.tokenStringSerializer.apply(authenticationToken);
 
-        return ResponseCookie.from("__Host-auth-token", authenticationTokenSerialized)
+        return ResponseCookie.from(tokenCookieNameProperties.getAuthCookieName(), authenticationTokenSerialized)
                 .httpOnly(true)
                 .path("/")
                 .maxAge((int) ChronoUnit.SECONDS.between(Instant.now(), authenticationToken.expiresAt()))
