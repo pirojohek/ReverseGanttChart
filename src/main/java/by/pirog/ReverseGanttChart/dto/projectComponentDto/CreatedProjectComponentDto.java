@@ -26,6 +26,9 @@ public class CreatedProjectComponentDto {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+
     private String creator;
 
     private String role;

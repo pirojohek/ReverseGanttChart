@@ -96,6 +96,12 @@ public class ProjectComponentEntity {
                 : null;
     }
 
+    public LocalDate getStartDateAsLocalDate() {
+        return startDate != null
+                ? LocalDate.ofInstant(startDate, ZoneOffset.UTC)
+                : null;
+    }
+
     public LocalDate getCreatedAtAsLocalDate() {
         return createdAt != null
                 ? LocalDate.ofInstant(createdAt, ZoneOffset.UTC)
