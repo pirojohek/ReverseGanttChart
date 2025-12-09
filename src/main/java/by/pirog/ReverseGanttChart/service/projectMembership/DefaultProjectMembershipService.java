@@ -161,4 +161,13 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
                 .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + email + " not found"));
     }
 
+    @Override
+    public InfoProjectMembershipDto parseProjectMembershipDto(ProjectMembershipEntity projectMembershipEntity) {
+        return InfoProjectMembershipDto.builder()
+                .userRole(projectMembershipEntity.getUserRole().getRoleName())
+                .projectId(projectMembershipEntity.getProject().getId())
+                .email(projectMembershipEntity.getUser().getEmail())
+                .build();
+    }
+
 }

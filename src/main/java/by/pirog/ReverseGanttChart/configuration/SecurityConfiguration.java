@@ -143,6 +143,8 @@ public class SecurityConfiguration {
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
                                 .requestMatchers("/api/membership/me").access(authorizationManagerFactory.hasProjectAccess())
 
+                                .requestMatchers("/api/taskStatus/").access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.STUDENT.getAuthority()))
+
                                 .requestMatchers("/api/projectComponent/action/**")
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))
                                 .requestMatchers("/api/projectComponent")

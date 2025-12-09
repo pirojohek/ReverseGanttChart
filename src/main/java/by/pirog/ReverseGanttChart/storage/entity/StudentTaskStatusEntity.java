@@ -20,6 +20,7 @@ public class StudentTaskStatusEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_student_id")
+    // todo - здесь немного неправильно, нужно было сделать TaskMaker, но уже поздно
     private ProjectMembershipEntity student;
 
     @OneToOne(fetch = FetchType.EAGER)
