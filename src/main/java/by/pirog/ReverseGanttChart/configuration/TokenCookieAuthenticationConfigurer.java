@@ -19,7 +19,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 public class TokenCookieAuthenticationConfigurer
@@ -29,11 +36,12 @@ public class TokenCookieAuthenticationConfigurer
     private Function<String, Token> tokenCookieStringDeserializer;
     private final UserRepository userRepository;
     private TokenCookieSessionAuthenticationStrategy tokenCookieSessionAuthenticationStrategy;
-
     private LoginIntoProjectCookieAuthenticationFilter loginIntoProjectCookieAuthenticationFilter;
     private LogoutFilter logoutFilter;
-
     private RedisTokenBlacklistService redisTokenBlacklistService;
+
+
+    private List<String> permitAllPaths = new ArrayList<>();
 
     private final TokenCookieNameProperties tokenCookieNameProperties;
     public TokenCookieAuthenticationConfigurer(ObjectMapper objectMapper, UserRepository userRepository
@@ -43,14 +51,28 @@ public class TokenCookieAuthenticationConfigurer
         this.tokenCookieNameProperties = tokenCookieNameProperties;
     }
 
+    public TokenCookieAuthenticationConfigurer permitAllForPatterns(String... patterns) {
+        this.permitAllPaths.addAll(Arrays.asList(patterns));
+        return this;
+    }
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
         var authenticationManager = http.getSharedObject(AuthenticationManager.class);
 
+        // UsernameAuthenticationFilter
         var usernamePasswordAuthenticationFilter = new LoginUsernamePasswordAuthenticationFilter(objectMapper);
         usernamePasswordAuthenticationFilter.setAuthenticationManager(authenticationManager);
         usernamePasswordAuthenticationFilter.setSessionAuthenticationStrategy(tokenCookieSessionAuthenticationStrategy);
 
+        RequestMatcher publicPathsMatcher = new OrRequestMatcher(
+                this.permitAllPaths.stream().map(AntPathRequestMatcher::new)
+                        .toArray(RequestMatcher[]::new)
+        );
+
+        RequestMatcher protectedPathMatcher = new NegatedRequestMatcher(publicPathsMatcher);
+
+        // AuthenticationProvider
         var delegateAuthenticationProvider = new PreAuthenticatedAuthenticationProvider();
         delegateAuthenticationProvider.setPreAuthenticatedUserDetailsService(
                 new TokenUserDetailsService(userRepository)
@@ -59,9 +81,12 @@ public class TokenCookieAuthenticationConfigurer
                 .preAuthenticatedAuthenticationProvider(new TokenUserDetailsService(userRepository))
                 .delegateAuthenticationProvider(delegateAuthenticationProvider);
 
+
         var cookieAuthenticationFilter = getAuthenticationFilter(authenticationManager);
+        cookieAuthenticationFilter.setRequestMatcher(protectedPathMatcher);
 
         var logoutFilter = this.logoutFilter;
+
         http.addFilterAfter(logoutFilter, CsrfFilter.class);
         http.addFilterAfter(usernamePasswordAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterAfter(cookieAuthenticationFilter, CsrfFilter.class);

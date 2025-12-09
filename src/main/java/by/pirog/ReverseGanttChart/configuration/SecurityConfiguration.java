@@ -112,7 +112,8 @@ public class SecurityConfiguration {
                 .tokenCookieAuthenticationStrategy(new TokenCookieSessionAuthenticationStrategy(tokenService))
                 .loginIntoProjectCookieAuthenticationFilter(loginIntoProjectCookieAuthenticationFilter)
                 .logoutFilter(logoutFilter)
-                .redisTokenBlacklistService(redisTokenBlacklistService);
+                .redisTokenBlacklistService(redisTokenBlacklistService)
+                .permitAllForPatterns("/api/auth/register", "/api/auth/login", "/api/auth/logout", "/errors/**");
     }
 
     @Bean
@@ -131,7 +132,7 @@ public class SecurityConfiguration {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests.requestMatchers("/api/auth/register", "/api/auth/login").anonymous()
+                        authorizeRequests.requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                                 .requestMatchers("/api/auth/logout").permitAll()
                                 .requestMatchers("/errors/**").permitAll()
                                 .requestMatchers("/api/project/info/**")
