@@ -10,6 +10,9 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class CreatedProjectComponentDto {
+
+    private Long id;
+
     @NotNull
     private String title;
 

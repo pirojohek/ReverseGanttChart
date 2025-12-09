@@ -74,9 +74,10 @@ public class DefaultProjectComponentService implements ProjectComponentService{
         entity.setDeadlineFromLocalDate(dto.deadline());
         entity.setStartDateFromLocalDate(dto.startDate());
 
-        this.projectComponentRepository.save(entity);
+        entity = this.projectComponentRepository.save(entity);
 
         return CreatedProjectComponentDto.builder()
+                .id(entity.getId())
                 .title(entity.getTitle())
                 .description(entity.getDescription())
                 .parentId(entity.getProjectComponentParent() != null ? entity.getProjectComponentParent().getId(): null)
@@ -171,6 +172,7 @@ public class DefaultProjectComponentService implements ProjectComponentService{
 
         return taskMakerEntities.stream()
                 .map(entity -> TaskMakerResponseDto.builder()
+                        .id(entity.getId())
                         .taskMakerInfo(getProjectMembershipAsDto(entity.getMembership()))
                         .taskId(entity.getProjectComponent().getId())
                         .build())
