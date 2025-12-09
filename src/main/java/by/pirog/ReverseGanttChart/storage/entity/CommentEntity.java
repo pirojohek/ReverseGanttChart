@@ -16,6 +16,7 @@ public class CommentEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "c_id")
     private Long commentId;
 
     @Column(name = "c_comment")

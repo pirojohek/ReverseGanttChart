@@ -9,7 +9,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Builder
@@ -21,6 +23,7 @@ import java.util.List;
 public class ProjectComponentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "c_id")
     private Long id;
 
     @Column(name = "c_title")
@@ -39,8 +42,7 @@ public class ProjectComponentEntity {
 
     @OneToMany(mappedBy = "projectComponentParent", cascade = CascadeType.ALL)
     @BatchSize(size = 20)
-    @OrderBy("createdAt ASC")
-    private List<ProjectComponentEntity> projectComponentChildren;
+    private Set<ProjectComponentEntity> projectComponentChildren = new HashSet<>();
 
     @Column(name = "c_created_at")
     private Instant createdAt;
@@ -62,11 +64,10 @@ public class ProjectComponentEntity {
     private ReviewerTaskStatusEntity reviewerTaskStatus;
 
     @OneToMany(mappedBy = "projectComponent", cascade = CascadeType.ALL)
-    private List<TaskMakerEntity> taskMakers;
+    private Set<TaskMakerEntity> taskMakers = new HashSet<>();
 
     @OneToMany(mappedBy = "projectComponent", cascade = CascadeType.ALL)
-    @OrderBy("createdAt")
-    private List<CommentEntity> comments;
+    private Set<CommentEntity> comments = new HashSet<>();
 
     public void setDeadlineFromLocalDate(LocalDate date) {
         if (date == null) {
@@ -91,7 +92,7 @@ public class ProjectComponentEntity {
 
     public void addTaskMaker(TaskMakerEntity taskMaker){
         if (taskMakers == null) {
-            taskMakers = new ArrayList<>();
+            taskMakers = new HashSet<>();
         }
         this.taskMakers.add(taskMaker);
     }

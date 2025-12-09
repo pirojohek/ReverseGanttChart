@@ -14,6 +14,7 @@ public class ReviewerTaskStatusEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "c_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
