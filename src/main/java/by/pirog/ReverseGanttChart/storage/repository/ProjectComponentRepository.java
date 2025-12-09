@@ -17,7 +17,7 @@ public interface ProjectComponentRepository extends JpaRepository<ProjectCompone
             "JOIN FETCH pc.project " +
             "LEFT JOIN pc.taskMakers " +
             "LEFT JOIN children.taskMakers " +
-            "WHERE pc.projectComponentParent.id = :componentId AND " +
+            "WHERE pc.id = :componentId AND " +
             "pc.project.id = :projectId")
     Optional<ProjectComponentEntity> findProjectComponentEntityByProjectIdAndComponentIdWithTaskMakers
             (@Param("componentId") Long componentId, @Param("projectId") Long projectId);

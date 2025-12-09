@@ -28,6 +28,8 @@ public class TaskMakersController {
         return ResponseEntity.ok(response);
     }
 
+    // Todo- нужно добавить обработку ошибок, что пользователь не может взять задачу повторно если он там есть
+
     @PostMapping("/setMaker")
     public ResponseEntity<List<TakenTaskResponseDto>> giveMembershipTasksToMake(@RequestParam("email") String email,
                                                                                 @RequestParam("taskId") Long taskId,
@@ -35,7 +37,6 @@ public class TaskMakersController {
         List<TakenTaskResponseDto> response = this.taskMakersService.giveMembershipTasksToMake(email, taskId, subtasks);
 
         return ResponseEntity.ok(response);
-
     }
 
     // Todo нужно еще добавить изменение исполняющего задачу, то есть его удалить ну тут уже без рекурсии
