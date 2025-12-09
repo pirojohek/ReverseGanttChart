@@ -118,10 +118,7 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   TokenCookieJweStringSerializer tokenCookieJweStringSerializer,
                                                    TokenCookieAuthenticationConfigurer tokenCookieAuthenticationConfigurer) throws Exception {
-
-
 
         http.csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))

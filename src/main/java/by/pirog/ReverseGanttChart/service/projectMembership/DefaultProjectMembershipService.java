@@ -129,7 +129,7 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
     @Override
     public List<ResponseUserMembershipMeDto> getAllUserMemberships() {
 
-        var userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
         List<ProjectMembershipEntity> projectMemberships = this.projectMembershipRepository
                 .findAllByUserEmail(userDetails.getEmail());
