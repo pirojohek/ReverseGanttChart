@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.TimeZone;
 
 @Service
@@ -72,6 +73,7 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                 .build();
         entity.setDeadlineFromLocalDate(dto.deadline());
 
+        this.projectComponentRepository.save(entity);
 
         return CreatedProjectComponentDto.builder()
                 .title(entity.getTitle())
@@ -124,7 +126,7 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                 .build();
     }
 
-    private List<TaskMakerResponseDto> getTaskMakersAsDto(List<TaskMakerEntity> taskMakerEntities) {
+    private List<TaskMakerResponseDto> getTaskMakersAsDto(Set<TaskMakerEntity> taskMakerEntities) {
         return taskMakerEntities.stream()
                 .map(entity -> TaskMakerResponseDto.builder()
                         .taskMakerInfo(getProjectMembershipAsDto(entity.getMembership()))
@@ -154,7 +156,7 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                 .build();
     }
 
-    private List<CommentResponseDto> getCommentsAsDto(List<CommentEntity> commentEntities) {
+    private List<CommentResponseDto> getCommentsAsDto(Set<CommentEntity> commentEntities) {
         return commentEntities.stream().map(entity ->
                 CommentResponseDto.builder()
                         .comment(entity.getComment())

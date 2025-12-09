@@ -17,6 +17,10 @@ public record CreateProjectComponentDto(
         Long parentId,
 
         @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate deadline
+        LocalDate deadline,
+
+
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        LocalDate startDate
 ) {
 }

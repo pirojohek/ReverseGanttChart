@@ -1,6 +1,7 @@
 package by.pirog.ReverseGanttChart.storage.repository;
 
 import by.pirog.ReverseGanttChart.storage.entity.ProjectComponentEntity;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,15 +28,16 @@ public interface ProjectComponentRepository extends JpaRepository<ProjectCompone
     Optional<ProjectComponentEntity> findProjectComponentEntityByProjectIdAndComponentId
             (@Param("projectId") Long projectId, @Param("componentId") Long componentId);
 
+    @EntityGraph(attributePaths = {
+            "project",
+            "projectComponentParent",
+            "creator",
+            "creator.user",
+            "creator.userRole",
+            "studentTaskStatus",
+            "reviewerTaskStatus"
+    })
     @Query("SELECT pc FROM ProjectComponentEntity pc " +
-            "LEFT JOIN FETCH pc.projectComponentChildren " +
-            "LEFT JOIN FETCH pc.project " +
-            "LEFT JOIN FETCH pc.projectComponentParent " +
-            "LEFT JOIN FETCH pc.comments " +
-            "LEFT JOIN FETCH pc.creator " +
-            "LEFT JOIN FETCH pc.reviewerTaskStatus " +
-            "LEFT JOIN FETCH pc.studentTaskStatus " +
-            "LEFT JOIN FETCH pc.taskMakers " +
             "WHERE pc.project.id = :projectId AND pc.id = :componentId")
     Optional<ProjectComponentEntity>
             findProjectComponentEntityByProjectIdAndComponentIdWithAllProperties(@Param("projectId") Long projectId, @Param("componentId") Long componentId);

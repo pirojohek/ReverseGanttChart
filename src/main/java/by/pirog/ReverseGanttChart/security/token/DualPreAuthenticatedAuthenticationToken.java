@@ -1,9 +1,11 @@
 package by.pirog.ReverseGanttChart.security.token;
 
+import by.pirog.ReverseGanttChart.security.user.CustomUserDetails;
 import lombok.Getter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 import java.util.ArrayList;
@@ -21,6 +23,14 @@ public class DualPreAuthenticatedAuthenticationToken extends PreAuthenticatedAut
 
     public DualPreAuthenticatedAuthenticationToken(Authentication authentication, Authentication projectAuthentication) {
         super(authentication.getPrincipal(), authentication.getCredentials(),
+                generateGrantedAuthorities(authentication, projectAuthentication));
+        this.authenticationAuth = authentication;
+        this.projectAuth = projectAuthentication;
+        this.grantedAuthorities = generateGrantedAuthorities(authentication, projectAuthentication);
+    }
+
+    public DualPreAuthenticatedAuthenticationToken(UserDetails userDetails, Authentication authentication, Authentication projectAuthentication){
+        super(userDetails, authentication.getCredentials(),
                 generateGrantedAuthorities(authentication, projectAuthentication));
         this.authenticationAuth = authentication;
         this.projectAuth = projectAuthentication;

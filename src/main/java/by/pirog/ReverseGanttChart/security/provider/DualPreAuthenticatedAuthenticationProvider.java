@@ -31,8 +31,9 @@ public class DualPreAuthenticatedAuthenticationProvider extends PreAuthenticated
         }
         UserDetails userDetails = this.preAuthenticatedUserDetailsService
                 .loadUserDetails((PreAuthenticatedAuthenticationToken) authentication);
+        var dualToken = (DualPreAuthenticatedAuthenticationToken) authentication;
+        var token = new DualPreAuthenticatedAuthenticationToken(userDetails,dualToken.getAuthenticationAuth(), dualToken.getProjectAuth());
 
-        var token = (DualPreAuthenticatedAuthenticationToken) authentication;
         token.setDetails(userDetails);
         token.setAuthenticated(true);
         return token;
