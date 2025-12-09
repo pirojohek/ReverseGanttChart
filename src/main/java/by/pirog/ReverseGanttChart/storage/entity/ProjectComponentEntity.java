@@ -65,6 +65,7 @@ public class ProjectComponentEntity {
     private List<TaskMakerEntity> taskMakers;
 
     @OneToMany(mappedBy = "projectComponent", cascade = CascadeType.ALL)
+    @OrderBy("createdAt")
     private List<CommentEntity> comments;
 
     public void setDeadlineFromLocalDate(LocalDate date) {

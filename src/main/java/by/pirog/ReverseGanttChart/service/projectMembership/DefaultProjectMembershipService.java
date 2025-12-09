@@ -138,6 +138,7 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
                 .email(entity.getUser().getEmail())
                 .projectId(entity.getProject().getId())
                 .role(entity.getUserRole().getRoleName())
+                .deadline(entity.getProject().getDeadlineAsLocalDate())
                 .projectDescription(entity.getProject().getProjectDescription())
                 .projectName(entity.getProject().getProjectName())
                         .build()).toList();

@@ -131,7 +131,8 @@ public class SecurityConfiguration {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests.requestMatchers("/api/auth/**").permitAll()
+                        authorizeRequests.requestMatchers("/api/auth/register", "/api/auth/login").anonymous()
+                                .requestMatchers("/api/auth/logout").permitAll()
                                 .requestMatchers("/errors/**").permitAll()
                                 .requestMatchers("/api/project/info/**")
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))

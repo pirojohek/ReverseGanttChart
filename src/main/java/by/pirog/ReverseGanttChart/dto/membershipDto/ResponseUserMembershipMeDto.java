@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,4 +19,6 @@ public class ResponseUserMembershipMeDto {
     private String projectName;
 
     private String projectDescription;
+
+    private LocalDate deadline;
 }
