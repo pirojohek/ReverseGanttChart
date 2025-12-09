@@ -41,7 +41,7 @@ public class ProjectComponentEntity {
     private ProjectComponentEntity projectComponentParent;
 
     @OneToMany(mappedBy = "projectComponentParent", cascade = CascadeType.ALL)
-    @BatchSize(size = 20)
+
     private Set<ProjectComponentEntity> projectComponentChildren = new HashSet<>();
 
     @Column(name = "c_created_at")
@@ -52,6 +52,9 @@ public class ProjectComponentEntity {
 
     @Column(name = "c_deadline")
     private Instant deadline;
+
+    @Column(name = "c_start_date")
+    private Instant startDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_creator_id")
@@ -75,6 +78,15 @@ public class ProjectComponentEntity {
         } else {
 
             this.deadline = date.atStartOfDay(ZoneOffset.UTC).toInstant();
+        }
+    }
+
+    public void setStartDateFromLocalDate(LocalDate date) {
+        if (date == null) {
+            this.startDate = null;
+        } else {
+
+            this.startDate = date.atStartOfDay(ZoneOffset.UTC).toInstant();
         }
     }
 

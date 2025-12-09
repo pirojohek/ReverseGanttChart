@@ -72,6 +72,7 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                 .createdAt(Instant.now())
                 .build();
         entity.setDeadlineFromLocalDate(dto.deadline());
+        entity.setStartDateFromLocalDate(dto.startDate());
 
         this.projectComponentRepository.save(entity);
 
@@ -86,6 +87,7 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                 .build();
     }
 
+
     @Override
     public ProjectComponentResponseDto getProjectComponentByIdWithoutHierarchy(Long componentId) {
 
@@ -99,18 +101,53 @@ public class DefaultProjectComponentService implements ProjectComponentService{
     }
 
     @Override
-    public ProjectComponentResponseDto getProjectComponentByProjectIdWithHierarchy(Long componentId) {
-        return null;
+    public List<ProjectComponentResponseDto> getProjectComponentsByProjectIdWithHierarchyOrderedByDate() {
+        var token = (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+        List<ProjectComponentEntity> rootComponents = this.projectComponentRepository
+                .findRootComponentsByProjectId(token.getProjectId());
+
+
+        return rootComponents.stream()
+                .map(this::buildHierarchy)
+                .toList();
+
     }
 
-    @Override
-    public List<ProjectComponentResponseDto> getProjectComponentsByProjectIdWithHierarchyOrderedByDate() {
-        return List.of();
+    private ProjectComponentResponseDto buildHierarchy(ProjectComponentEntity projectComponentEntity) {
+        ProjectComponentResponseDto dto = getProjectComponentAsDto(projectComponentEntity);
+
+        List<ProjectComponentEntity> children = projectComponentRepository.findChildrenByParentId(projectComponentEntity.getId());
+
+        if (!children.isEmpty()) {
+            List<ProjectComponentResponseDto> childDtos = children.stream()
+                    .map(this::buildHierarchy)
+                    .toList();
+
+            dto = ProjectComponentResponseDto.builder()
+                    .id(projectComponentEntity.getId())
+                    .title(dto.getTitle())
+                    .description(dto.getDescription())
+                    .projectId(dto.getProjectId())
+                    .parentId(dto.getParentId())
+                    .createdDate(dto.getCreatedDate())
+                    .pos(dto.getPos())
+                    .creator(dto.getCreator())
+                    .taskStatus(dto.getTaskStatus())
+                    .reviewerTaskStatus(dto.getReviewerTaskStatus())
+                    .taskMakers(dto.getTaskMakers())
+                    .comments(dto.getComments())
+                    .children(childDtos)
+                    .build();
+        }
+        return dto;
     }
+
 
     private ProjectComponentResponseDto getProjectComponentAsDto(ProjectComponentEntity entity) {
 
         return ProjectComponentResponseDto.builder()
+                .id(entity.getId())
                 .title(entity.getTitle())
                 .description(entity.getDescription())
                 .projectId(entity.getProject().getId())
@@ -127,6 +164,11 @@ public class DefaultProjectComponentService implements ProjectComponentService{
     }
 
     private List<TaskMakerResponseDto> getTaskMakersAsDto(Set<TaskMakerEntity> taskMakerEntities) {
+        if (taskMakerEntities == null || taskMakerEntities.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+
         return taskMakerEntities.stream()
                 .map(entity -> TaskMakerResponseDto.builder()
                         .taskMakerInfo(getProjectMembershipAsDto(entity.getMembership()))
@@ -141,7 +183,12 @@ public class DefaultProjectComponentService implements ProjectComponentService{
 
     private StudentTaskStatusResponseDto getStudentTaskStatusAsDto(StudentTaskStatusEntity studentTaskStatusEntity) {
         // Todo это тоже очень медленно выходит
+
+        if (studentTaskStatusEntity == null) {
+            return null;
+        }
         return StudentTaskStatusResponseDto.builder()
+                .id(studentTaskStatusEntity.getId())
                 .student(getProjectMembershipAsDto(studentTaskStatusEntity.getStudent()))
                 .taskId(studentTaskStatusEntity.getTask().getId())
                 .status(studentTaskStatusEntity.getStatus().getStatusName())
@@ -149,7 +196,11 @@ public class DefaultProjectComponentService implements ProjectComponentService{
     }
 
     private ReviewerTaskStatusResponseDto getReviewerTaskStatusAsDto(ReviewerTaskStatusEntity reviewerTaskStatusEntity) {
+        if (reviewerTaskStatusEntity == null) {
+            return null;
+        }
         return ReviewerTaskStatusResponseDto.builder()
+                .id(reviewerTaskStatusEntity.getId())
                 .reviewer(getProjectMembershipAsDto(reviewerTaskStatusEntity.getProjectMembership()))
                 .taskId(reviewerTaskStatusEntity.getTask().getId())
                 .status(reviewerTaskStatusEntity.getTaskStatus().getStatusName())
@@ -157,8 +208,12 @@ public class DefaultProjectComponentService implements ProjectComponentService{
     }
 
     private List<CommentResponseDto> getCommentsAsDto(Set<CommentEntity> commentEntities) {
+        if (commentEntities == null || commentEntities.isEmpty()) {
+            return new ArrayList<>();
+        }
         return commentEntities.stream().map(entity ->
                 CommentResponseDto.builder()
+                        .id(entity.getCommentId())
                         .comment(entity.getComment())
                         .commenter(getProjectMembershipAsDto(entity.getCommenter()))
                         .createdAt(LocalDateTime.ofInstant(entity.getCreatedAt(), TimeZone.getDefault().toZoneId()))
@@ -169,6 +224,9 @@ public class DefaultProjectComponentService implements ProjectComponentService{
 
     private InfoProjectMembershipDto getProjectMembershipAsDto(ProjectMembershipEntity projectMembershipEntity) {
         // Todo оптимизировать
+        if (projectMembershipEntity == null) {
+            return null;
+        }
         return InfoProjectMembershipDto.builder()
                 .email(projectMembershipEntity.getUser().getEmail())
                 .userRole(projectMembershipEntity.getUserRole().getRoleName())

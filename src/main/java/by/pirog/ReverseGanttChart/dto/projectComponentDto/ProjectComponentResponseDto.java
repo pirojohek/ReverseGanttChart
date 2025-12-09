@@ -17,6 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 public class ProjectComponentResponseDto {
+    private Long id;
+
     private String title;
     private String description;
     private Long projectId;

@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class StudentTaskStatusResponseDto {
+    private Long id;
+
     private InfoProjectMembershipDto student;
 
     private Long taskId;

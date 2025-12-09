@@ -37,4 +37,9 @@ public class ProjectComponentController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<ProjectComponentResponseDto>> getAllProjectComponents(){
+        return ResponseEntity.ok(this.projectComponentService.getProjectComponentsByProjectIdWithHierarchyOrderedByDate());
+    }
+
 }

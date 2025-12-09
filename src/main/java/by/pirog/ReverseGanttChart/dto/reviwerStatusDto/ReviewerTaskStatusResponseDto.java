@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReviewerTaskStatusResponseDto {
+    private Long id;
+
     private InfoProjectMembershipDto reviewer;
 
     private Long taskId;

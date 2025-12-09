@@ -12,7 +12,7 @@ public interface ProjectComponentService {
 
     ProjectComponentResponseDto getProjectComponentByIdWithoutHierarchy(Long componentId);
 
-    ProjectComponentResponseDto getProjectComponentByProjectIdWithHierarchy(Long componentId);
-
     List<ProjectComponentResponseDto> getProjectComponentsByProjectIdWithHierarchyOrderedByDate();
+
+
 }
