@@ -27,6 +27,6 @@ public class ReviewerTaskStatusEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "c_task_status_id")
-    private TaskStatusEntity taskStatus;
+    private ReviewerStatusEntity taskStatus;
 
 }
