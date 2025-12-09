@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/taskStatus")
+@RequestMapping("/api/studentTaskStatus")
 public class StudentTaskStatusController {
 
     private final StudentTaskStatusService taskStatusService;
