@@ -13,4 +13,6 @@ public interface TaskMakersService {
     List<TakenTaskResponseDto> giveMembershipTasksToMake(String email, Long taskId, Boolean subtasks);
 
     List<TakenTaskResponseDto> tasksToMake(ProjectMembershipEntity membership, Long taskId, Boolean subtasks);
+
+    void removeTaskMakerById(Long taskMakerId);
 }

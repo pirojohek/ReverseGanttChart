@@ -70,6 +70,13 @@ public class DefaultTaskMakersService implements TaskMakersService {
 
     }
 
+
+    @Override
+    public void removeTaskMakerById(Long taskMakerId) {
+        this.taskMakerRepository.deleteById(taskMakerId);
+    }
+
+
     private void collectAssignedTasks(ProjectComponentEntity node,
                                       ProjectMembershipEntity membership,
                                       List<TakenTaskResponseDto> result) {

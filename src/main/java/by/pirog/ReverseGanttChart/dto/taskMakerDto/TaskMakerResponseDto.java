@@ -13,6 +13,5 @@ import lombok.NoArgsConstructor;
 public class TaskMakerResponseDto {
     private Long id;
     private Long taskId;
-
     private InfoProjectMembershipDto taskMakerInfo;
 }

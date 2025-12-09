@@ -4,10 +4,7 @@ import by.pirog.ReverseGanttChart.dto.taskMakerDto.TakenTaskResponseDto;
 import by.pirog.ReverseGanttChart.service.taskMakers.TaskMakersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,4 +37,10 @@ public class TaskMakersController {
     }
 
     // Todo нужно еще добавить изменение исполняющего задачу, то есть его удалить ну тут уже без рекурсии
+
+    @DeleteMapping
+    public ResponseEntity<?> removeMembershipTasksMaker(@RequestParam("taskMakerId") Long taskId) {
+        this.taskMakersService.removeTaskMakerById(taskId);
+        return ResponseEntity.noContent().build();
+    }
 }
