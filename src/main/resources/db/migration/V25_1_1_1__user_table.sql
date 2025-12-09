@@ -55,7 +55,7 @@ CREATE TABLE storage.t_task_status
 -- Заполнение task_status
 INSERT INTO storage.t_task_status (c_status)
 VALUES ('Completed'),
-       ('Planner'),
+       ('Planned'),
        ('In process'),
        ('Delayed');
 
@@ -122,7 +122,7 @@ CREATE TABLE storage.t_comment
     c_comment              TEXT    NOT NULL,
     c_commenter            INTEGER NOT NULL REFERENCES storage.t_project_membership (c_id),
     c_project_component_id INTEGER NOT NULL REFERENCES storage.t_project_component (c_id),
-    c_created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    c_created_at           NOT NULL TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     c_updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 );

@@ -213,7 +213,9 @@ public class DefaultProjectComponentService implements ProjectComponentService{
         if (commentEntities == null || commentEntities.isEmpty()) {
             return new ArrayList<>();
         }
-        return commentEntities.stream().map(entity ->
+        return commentEntities.stream()
+                .filter(entity -> entity.getCreatedAt() != null)
+                .map(entity ->
                 CommentResponseDto.builder()
                         .id(entity.getCommentId())
                         .comment(entity.getComment())
