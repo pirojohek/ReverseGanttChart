@@ -148,6 +148,17 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                 .build();
     }
 
+    @Override
+    public void deleteProjectComponentById(Long componentId) {
+        var token = (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+
+        ProjectComponentEntity component = projectComponentRepository
+                .findProjectComponentEntityByProjectIdAndComponentId(token.getProjectId(), componentId)
+                .orElseThrow(() -> new ProjectComponentNotFoundException(componentId.toString()));
+        this.projectComponentRepository.delete(component);
+    }
+
     private ProjectComponentResponseDto buildHierarchy(ProjectComponentEntity projectComponentEntity) {
         ProjectComponentResponseDto dto = getProjectComponentAsDto(projectComponentEntity);
 

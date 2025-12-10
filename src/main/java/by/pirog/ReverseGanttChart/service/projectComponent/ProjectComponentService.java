@@ -13,4 +13,6 @@ public interface ProjectComponentService {
     List<ProjectComponentResponseDto> getProjectComponentsByProjectIdWithHierarchyOrderedByDate();
 
     UpdatedProjectComponentResponseDto patchProjectComponent(UpdateProjectComponentRequestDto dto);
+
+    void deleteProjectComponentById(Long componentId);
 }

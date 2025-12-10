@@ -46,4 +46,10 @@ public class ProjectComponentController {
         return ResponseEntity.ok(response);
     }
 
+
+    @DeleteMapping("/action/delete")
+    public ResponseEntity<Void> deleteProjectComponent(@RequestParam(name = "componentId") Long componentId){
+        this.projectComponentService.deleteProjectComponentById(componentId);
+        return ResponseEntity.noContent().build();
+    }
 }
