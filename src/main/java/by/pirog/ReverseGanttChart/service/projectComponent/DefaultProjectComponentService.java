@@ -81,7 +81,7 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                 .parentId(entity.getProjectComponentParent() != null ? entity.getProjectComponentParent().getId(): null)
                 .deadline(entity.getDeadlineAsLocalDate())
                 .startDate(entity.getStartDateAsLocalDate())
-                .createdAt(entity.getDeadlineAsLocalDate())
+                .createdAt(entity.getCreatedAtAsLocalDate())
                 .creator(entity.getCreator().getUser().getEmail())
                 .role(entity.getCreator().getUserRole().getRoleName())
                 .build();
@@ -184,6 +184,8 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                     .description(dto.getDescription())
                     .projectId(dto.getProjectId())
                     .parentId(dto.getParentId())
+                    .deadline(dto.getDeadline())
+                    .startData(dto.getStartData())
                     .createdDate(dto.getCreatedDate())
                     .pos(dto.getPos())
                     .creator(dto.getCreator())
@@ -193,6 +195,7 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                     .comments(dto.getComments())
                     .children(childDtos)
                     .build();
+
         }
         return dto;
     }
