@@ -41,7 +41,7 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
 
     @Override
     public void addMembershipToProjectByEmail(AddProjectMembershipDto dto) {
-        if (dto.userRole().equals(UserRole.ADMIN)) {
+        if (dto.userRole().equals(UserRole.ADMIN.getAuthority())) {
             throw new ActionDenied("You cant add any administrator to this project");
         }
 
