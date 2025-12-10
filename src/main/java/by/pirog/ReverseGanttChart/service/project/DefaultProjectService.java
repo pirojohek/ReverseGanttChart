@@ -78,16 +78,17 @@ public class DefaultProjectService implements ProjectService, ProjectEntityServi
         ProjectEntity project = projectRepository.findById(token.getProjectId())
                 .orElseThrow(() -> new ProjectNotFoundException("Project not found " + token.getProjectId()));
 
-        if (dto.deadline() != null) {
-            project.setDeadlineFromLocalDate(dto.deadline());
+        if (dto.hasProjectName()){
+            project.setProjectName(dto.projectName());
         }
-        if (dto.description() != null && !dto.description().isEmpty()) {
+        if (dto.hasDescription()){
             project.setProjectDescription(dto.description());
         }
-        if (dto.name() != null && !dto.name().isEmpty()) {
-            project.setProjectName(dto.name());
+        if (dto.hasDeadline()){
+            project.setDeadlineFromLocalDate(dto.deadline());
         }
-        this.projectRepository.save(project);
+
+        project = this.projectRepository.save(project);
 
         return UpdatedProjectDto.builder()
                 .projectName(project.getProjectName())
