@@ -18,7 +18,7 @@ public class StudentTaskStatusController {
 
     private final StudentTaskStatusService taskStatusService;
 
-    @PostMapping("setTaskStatus")
+    @PostMapping("/setTaskStatus")
     public ResponseEntity<StudentTaskStatusResponseDto> setTaskStatus(@RequestBody SetTaskStatusRequestDto dto) {
         StudentTaskStatusResponseDto response = this.taskStatusService.setTaskStatus(dto);
         return ResponseEntity.ok(response);
