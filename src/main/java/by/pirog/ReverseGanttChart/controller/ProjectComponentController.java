@@ -1,8 +1,6 @@
 package by.pirog.ReverseGanttChart.controller;
 
-import by.pirog.ReverseGanttChart.dto.projectComponentDto.CreateProjectComponentDto;
-import by.pirog.ReverseGanttChart.dto.projectComponentDto.CreatedProjectComponentDto;
-import by.pirog.ReverseGanttChart.dto.projectComponentDto.ProjectComponentResponseDto;
+import by.pirog.ReverseGanttChart.dto.projectComponentDto.*;
 import by.pirog.ReverseGanttChart.service.projectComponent.ProjectComponentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +38,12 @@ public class ProjectComponentController {
     @GetMapping("/all")
     public ResponseEntity<List<ProjectComponentResponseDto>> getAllProjectComponents(){
         return ResponseEntity.ok(this.projectComponentService.getProjectComponentsByProjectIdWithHierarchyOrderedByDate());
+    }
+
+    @PatchMapping("/action/update")
+    public ResponseEntity<UpdatedProjectComponentResponseDto>  updateProjectComponent(@RequestBody UpdateProjectComponentRequestDto updateProjectComponentRequestDto){
+        UpdatedProjectComponentResponseDto response = this.projectComponentService.patchProjectComponent(updateProjectComponentRequestDto);
+        return ResponseEntity.ok(response);
     }
 
 }

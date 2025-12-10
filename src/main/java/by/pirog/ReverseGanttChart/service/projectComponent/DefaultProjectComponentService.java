@@ -2,9 +2,7 @@ package by.pirog.ReverseGanttChart.service.projectComponent;
 
 import by.pirog.ReverseGanttChart.dto.commentDto.CommentResponseDto;
 import by.pirog.ReverseGanttChart.dto.membershipDto.InfoProjectMembershipDto;
-import by.pirog.ReverseGanttChart.dto.projectComponentDto.CreateProjectComponentDto;
-import by.pirog.ReverseGanttChart.dto.projectComponentDto.CreatedProjectComponentDto;
-import by.pirog.ReverseGanttChart.dto.projectComponentDto.ProjectComponentResponseDto;
+import by.pirog.ReverseGanttChart.dto.projectComponentDto.*;
 import by.pirog.ReverseGanttChart.dto.reviwerStatusDto.ReviewerTaskStatusResponseDto;
 import by.pirog.ReverseGanttChart.dto.studentStatusDto.StudentTaskStatusResponseDto;
 import by.pirog.ReverseGanttChart.dto.taskMakerDto.TaskMakerResponseDto;
@@ -114,6 +112,40 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                 .map(this::buildHierarchy)
                 .toList();
 
+    }
+
+    @Override
+    public UpdatedProjectComponentResponseDto patchProjectComponent(UpdateProjectComponentRequestDto dto) {
+        var token = (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+        ProjectComponentEntity entity = this.projectComponentRepository
+                .findProjectComponentEntityByProjectIdAndComponentIdWithAllProperties(token.getProjectId(), dto.componentId())
+                .orElseThrow(() -> new ProjectComponentNotFoundException(dto.componentId().toString()));
+
+        if (dto.hasTitle()) {
+            entity.setTitle(dto.title());
+        }
+        if (dto.hasDescription()) {
+            entity.setDescription(dto.description());
+        }
+
+        if (dto.hasDeadline()){
+            entity.setDeadlineFromLocalDate(dto.deadline());
+        }
+
+        if (dto.hasStartDate()){
+            entity.setStartDateFromLocalDate(dto.startDate());
+        }
+
+        entity = projectComponentRepository.save(entity);
+
+        return UpdatedProjectComponentResponseDto.builder()
+                .componentId(entity.getId())
+                .title(entity.getTitle())
+                .description(entity.getDescription())
+                .deadline(entity.getDeadlineAsLocalDate())
+                .startDate(entity.getStartDateAsLocalDate())
+                .build();
     }
 
     private ProjectComponentResponseDto buildHierarchy(ProjectComponentEntity projectComponentEntity) {
