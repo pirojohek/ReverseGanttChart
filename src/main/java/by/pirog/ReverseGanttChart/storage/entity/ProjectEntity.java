@@ -43,6 +43,9 @@ public class ProjectEntity {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<ProjectComponentEntity> projectComponents;
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<ProjectMembershipEntity> projectMemberships;
+
     public void setDeadlineFromLocalDate(LocalDate date) {
         if (date == null) {
             this.deadline = null;
