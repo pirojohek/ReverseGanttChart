@@ -156,6 +156,15 @@ public class DefaultProjectComponentService implements ProjectComponentService{
         ProjectComponentEntity component = projectComponentRepository
                 .findProjectComponentEntityByProjectIdAndComponentId(token.getProjectId(), componentId)
                 .orElseThrow(() -> new ProjectComponentNotFoundException(componentId.toString()));
+
+
+        if (component.getProjectComponentParent() != null) {
+            ProjectComponentEntity parent = component.getProjectComponentParent();
+            parent.getProjectComponentChildren().remove(component);
+            component.setProjectComponentParent(null);
+            projectComponentRepository.save(parent);
+        }
+
         this.projectComponentRepository.delete(component);
     }
 

@@ -41,7 +41,6 @@ public class ProjectComponentEntity {
     private ProjectComponentEntity projectComponentParent;
 
     @OneToMany(mappedBy = "projectComponentParent", cascade = CascadeType.ALL)
-
     private Set<ProjectComponentEntity> projectComponentChildren = new HashSet<>();
 
     @Column(name = "c_created_at")
