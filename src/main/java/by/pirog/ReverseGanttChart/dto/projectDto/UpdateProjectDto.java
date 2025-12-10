@@ -12,7 +12,7 @@ import java.util.Date;
 
 public record UpdateProjectDto(
         String projectName,
-        String description,
+        String projectDescription,
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate deadline
 ){
@@ -21,7 +21,7 @@ public record UpdateProjectDto(
         }
 
         public boolean hasDescription() {
-                return description != null;
+                return projectDescription != null;
         }
 
         public boolean hasDeadline() {

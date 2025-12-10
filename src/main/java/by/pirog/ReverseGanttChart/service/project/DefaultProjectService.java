@@ -82,7 +82,7 @@ public class DefaultProjectService implements ProjectService, ProjectEntityServi
             project.setProjectName(dto.projectName());
         }
         if (dto.hasDescription()){
-            project.setProjectDescription(dto.description());
+            project.setProjectDescription(dto.projectDescription());
         }
         if (dto.hasDeadline()){
             project.setDeadlineFromLocalDate(dto.deadline());
