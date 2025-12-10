@@ -14,10 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Service
@@ -45,7 +42,6 @@ public class DefaultTaskMakersService implements TaskMakersService {
         return tasksToMake(membership, taskId, subtasks);
     }
 
-    // Todo - здесь какая то шляпа с приватностью методов
     @Override
     public List<TakenTaskResponseDto> tasksToMake(ProjectMembershipEntity membership, Long taskId, Boolean subtasks) {
 
@@ -108,11 +104,17 @@ public class DefaultTaskMakersService implements TaskMakersService {
                 .build();
     }
     private void assignToComponent(ProjectMembershipEntity membership, ProjectComponentEntity projectComponent) {
-        TaskMakerEntity taskMaker = TaskMakerEntity.builder()
-                .membership(membership)
-                .projectComponent(projectComponent)
-                .build();
-        projectComponent.addTaskMaker(taskMaker);
+        // Todo - нужно сделать проверку перед добавлением, чтобы не добавлялся пользователь несколько раз
+        Optional<TaskMakerEntity> maker = this.taskMakerRepository.findTaskMakerEntityByMembershipIdAndProjectComponentId(membership.getId(), projectComponent.getId());
+
+        if (maker.isEmpty()){
+            TaskMakerEntity taskMaker = TaskMakerEntity.builder()
+                    .membership(membership)
+                    .projectComponent(projectComponent)
+                    .build();
+            projectComponent.addTaskMaker(taskMaker);
+        }
+
     }
 
     private void setTaskMaker(Boolean recursive, ProjectMembershipEntity membership,
