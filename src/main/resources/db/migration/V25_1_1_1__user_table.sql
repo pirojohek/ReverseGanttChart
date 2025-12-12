@@ -5,7 +5,7 @@ CREATE SCHEMA IF NOT EXISTS storage;
 CREATE TABLE storage.t_user
 (
     c_id       SERIAL PRIMARY KEY,
---     с_username VARCHAR(512) NOT NULL,
+    с_username VARCHAR(512) NOT NULL UNIQUE,
     c_email    VARCHAR(512)  NOT NULL UNIQUE,
     c_password VARCHAR(1024) NOT null
 );
@@ -35,7 +35,7 @@ CREATE TABLE storage.t_project_membership
     c_id        SERIAL PRIMARY KEY,
     c_user_role INTEGER NOT NULL REFERENCES storage.t_project_user_role (c_id),
     c_user      INTEGER NOT NULL REFERENCES storage.t_user (c_id),
---     c_project_username VARCHAR(512),
+    c_project_username VARCHAR(512),
     c_project   INTEGER NOT NULL REFERENCES storage.t_project (c_id),
     UNIQUE (c_user, c_project) -- Один пользователь может иметь только одну роль в проекте
 );
@@ -138,20 +138,20 @@ CREATE TABLE storage.t_project_invite(
     c_inviter INTEGER NOT NULL REFERENCES storage.t_project_membership (c_id)
 );
 
---
--- CREATE OR REPLACE FUNCTION storage.set_default_username()
--- RETURNS TRIGGER AS $$
--- BEGIN
---     IF NEW.c_project_username IS NULL OR NEW.c_project_username = '' THEN
--- SELECT c_username INTO NEW.c_project_username
--- FROM storage.t_user
--- WHERE c_id = NEW.c_user;
--- END IF;
--- RETURN NEW;
--- END;
--- $$ LANGUAGE plpsql;
---
--- CREATE TRIGGER trg_set_default_username
---     BEFORE INSERT ON storage.t_project_membership
---     FOR EACH ROW
---     EXECUTE FUNCTION storage.set_default_username();
+
+CREATE OR REPLACE FUNCTION storage.set_default_username()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.c_project_username IS NULL OR NEW.c_project_username = '' THEN
+SELECT c_username INTO NEW.c_project_username
+FROM storage.t_user
+WHERE c_id = NEW.c_user;
+END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE plpsql;
+
+CREATE TRIGGER trg_set_default_username
+    BEFORE INSERT ON storage.t_project_membership
+    FOR EACH ROW
+    EXECUTE FUNCTION storage.set_default_username();

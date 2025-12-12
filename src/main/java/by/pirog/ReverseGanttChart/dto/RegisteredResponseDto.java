@@ -7,4 +7,5 @@ import lombok.Data;
 @Data
 public class RegisteredResponseDto {
     private String email;
+    private String username;
 }
