@@ -27,4 +27,6 @@ public interface MembershipService {
     ProjectMembershipEntity getProjectMembershipByEmail(String email);
 
     InfoProjectMembershipDto parseProjectMembershipDto(ProjectMembershipEntity projectMembershipEntity);
+
+    void saveProjectMembership(ProjectMembershipEntity projectMembershipEntity);
 }

@@ -170,4 +170,9 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
                 .build();
     }
 
+    @Override
+    public void saveProjectMembership(ProjectMembershipEntity projectMembershipEntity) {
+        this.projectMembershipRepository.save(projectMembershipEntity);
+    }
+
 }

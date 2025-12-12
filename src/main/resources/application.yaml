@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ReverseGanttChart=
+    name: ReverseGanttChart
   datasource:
     url: jdbc:postgresql://localhost:54321/storage
     password: password
@@ -26,6 +26,23 @@ spring:
       password: password
       timeout: 2000ms
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username:
+    password:
+    protocol: smtp
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+        debug: true
 
 jwt:
   cookie-token-key: '{"kty":"oct","k":"956PBFst1FguLr5irJD-aQ"}'
@@ -35,7 +52,12 @@ logging:
     org.springframework.web: DEBUG
     org.hibernate: DEBUG
 
+
 app:
+  frontend-url: http://localhost:8080
+  email:
+    from: pirojochek01@gmail.com
+
   security:
     token:
       blacklist-token-project-ttl: 2d

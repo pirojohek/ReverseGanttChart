@@ -31,7 +31,7 @@ public class MembershipController {
 
         return ResponseEntity.ok(response);
     }
-
+    // Todo перед продом запретить этот эндпоинт
     @PostMapping("/action/add")
     public ResponseEntity<Void> addProjectMembership(@RequestBody AddProjectMembershipDto projectMembershipDto) {
         this.membershipService.addMembershipToProjectByEmail(projectMembershipDto);

@@ -107,7 +107,8 @@ public class SecurityConfiguration {
                 .loginIntoProjectCookieAuthenticationFilter(loginIntoProjectCookieAuthenticationFilter)
                 .logoutFilter(logoutFilter)
                 .redisTokenBlacklistService(redisTokenBlacklistService)
-                .permitAllForPatterns("/api/auth/register", "/api/auth/login", "/api/auth/logout", "/errors/**");
+                .permitAllForPatterns("/api/auth/register", "/api/auth/login", "/api/auth/logout", "/errors/**",
+                        "api/invite/accept");
     }
 
     @Bean
@@ -126,6 +127,7 @@ public class SecurityConfiguration {
                         authorizeRequests.requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                                 .requestMatchers("/api/auth/logout").permitAll()
                                 .requestMatchers("/errors/**").permitAll()
+                                .requestMatchers("/api/invite/accept").permitAll()
                                 .requestMatchers("/api/project/info/**")
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
                                 .requestMatchers("/api/project/action/**")

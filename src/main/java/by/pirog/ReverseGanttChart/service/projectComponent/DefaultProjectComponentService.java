@@ -23,10 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +34,9 @@ public class DefaultProjectComponentService implements ProjectComponentService{
     private final ProjectComponentRepository projectComponentRepository;
 
     private final GetProjectMembershipByUserEmailAndProjectId getProjectMembershipByUserEmailAndProjectId;
+
+
+    // ========================== CREATE ================================
 
     @Override
     public CreatedProjectComponentDto createProjectComponent(CreateProjectComponentDto dto) {
@@ -104,14 +104,26 @@ public class DefaultProjectComponentService implements ProjectComponentService{
     public List<ProjectComponentResponseDto> getProjectComponentsByProjectIdWithHierarchyOrderedByDate() {
         var token = (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        List<ProjectComponentEntity> rootComponents = this.projectComponentRepository
-                .findRootComponentsByProjectId(token.getProjectId());
+        List<ProjectComponentEntity> allComponents = projectComponentRepository.findAllByProjectIdWithGraph(token.getProjectId());
 
+        Map<Long, ProjectComponentResponseDto> componentMap = new HashMap<>();
+        for (ProjectComponentEntity entity : allComponents) {
+            componentMap.put(entity.getId(), getProjectComponentAsDto(entity));
+        }
 
-        return rootComponents.stream()
-                .map(this::buildHierarchy)
-                .toList();
+        List<ProjectComponentResponseDto> roots = new ArrayList<>();
+        for (ProjectComponentEntity entity : allComponents) {
+            ProjectComponentResponseDto dto = componentMap.get(entity.getId());
+            if (entity.getProjectComponentParent() != null) {
+                ProjectComponentResponseDto parentDto = componentMap.get(entity.getProjectComponentParent().getId());
+                parentDto.getChildren().add(dto);
+            } else {
+                roots.add(dto);
+            }
+        }
 
+        roots.sort(Comparator.comparing(ProjectComponentResponseDto::getCreatedDate));
+        return roots;
     }
 
     @Override
@@ -122,22 +134,10 @@ public class DefaultProjectComponentService implements ProjectComponentService{
                 .findProjectComponentEntityByProjectIdAndComponentIdWithAllProperties(token.getProjectId(), dto.componentId())
                 .orElseThrow(() -> new ProjectComponentNotFoundException(dto.componentId().toString()));
 
-        if (dto.hasTitle()) {
-            entity.setTitle(dto.title());
-        }
-        if (dto.hasDescription()) {
-            entity.setDescription(dto.description());
-        }
-
-        if (dto.hasDeadline()){
-            entity.setDeadlineFromLocalDate(dto.deadline());
-        }
-
-        if (dto.hasStartDate()){
-            entity.setStartDateFromLocalDate(dto.startDate());
-        }
-
-        entity = projectComponentRepository.save(entity);
+        Optional.ofNullable(dto.title()).ifPresent(entity::setTitle);
+        Optional.ofNullable(dto.description()).ifPresent(entity::setDescription);
+        Optional.ofNullable(dto.startDate()).ifPresent(entity::setStartDateFromLocalDate);
+        Optional.ofNullable(dto.deadline()).ifPresent(entity::setDeadlineFromLocalDate);
 
         return UpdatedProjectComponentResponseDto.builder()
                 .componentId(entity.getId())
@@ -167,39 +167,6 @@ public class DefaultProjectComponentService implements ProjectComponentService{
 
         this.projectComponentRepository.delete(component);
     }
-
-    private ProjectComponentResponseDto buildHierarchy(ProjectComponentEntity projectComponentEntity) {
-        ProjectComponentResponseDto dto = getProjectComponentAsDto(projectComponentEntity);
-
-        List<ProjectComponentEntity> children = projectComponentRepository.findChildrenByParentId(projectComponentEntity.getId());
-
-        if (!children.isEmpty()) {
-            List<ProjectComponentResponseDto> childDtos = children.stream()
-                    .map(this::buildHierarchy)
-                    .toList();
-
-            dto = ProjectComponentResponseDto.builder()
-                    .id(projectComponentEntity.getId())
-                    .title(dto.getTitle())
-                    .description(dto.getDescription())
-                    .projectId(dto.getProjectId())
-                    .parentId(dto.getParentId())
-                    .deadline(dto.getDeadline())
-                    .startData(dto.getStartData())
-                    .createdDate(dto.getCreatedDate())
-                    .pos(dto.getPos())
-                    .creator(dto.getCreator())
-                    .taskStatus(dto.getTaskStatus())
-                    .reviewerTaskStatus(dto.getReviewerTaskStatus())
-                    .taskMakers(dto.getTaskMakers())
-                    .comments(dto.getComments())
-                    .children(childDtos)
-                    .build();
-
-        }
-        return dto;
-    }
-
 
     private ProjectComponentResponseDto getProjectComponentAsDto(ProjectComponentEntity entity) {
 
@@ -242,8 +209,6 @@ public class DefaultProjectComponentService implements ProjectComponentService{
     }
 
     private StudentTaskStatusResponseDto getStudentTaskStatusAsDto(StudentTaskStatusEntity studentTaskStatusEntity) {
-        // Todo это тоже очень медленно выходит
-
         if (studentTaskStatusEntity == null) {
             return null;
         }
@@ -285,7 +250,6 @@ public class DefaultProjectComponentService implements ProjectComponentService{
     }
 
     private InfoProjectMembershipDto getProjectMembershipAsDto(ProjectMembershipEntity projectMembershipEntity) {
-        // Todo оптимизировать
         if (projectMembershipEntity == null) {
             return null;
         }
