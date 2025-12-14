@@ -20,10 +20,6 @@ public class CleaningJwtCookiesLogoutHandler implements LogoutHandler {
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         response.addHeader(HttpHeaders.SET_COOKIE,
                 createExpiredJwtCookie(this.tokenCookieNameProperties.getAuthCookieName()).toString());
-
-        response.addHeader(HttpHeaders.SET_COOKIE,
-                createExpiredJwtCookie(this.tokenCookieNameProperties.getProjectCookieName()).toString());
-
     }
 
     private ResponseCookie createExpiredJwtCookie(String cookieName){

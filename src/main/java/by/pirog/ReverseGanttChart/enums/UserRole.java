@@ -1,4 +1,4 @@
-package by.pirog.ReverseGanttChart.security.enums;
+package by.pirog.ReverseGanttChart.enums;
 
 public enum UserRole {
     ADMIN("ROLE_ADMIN"),

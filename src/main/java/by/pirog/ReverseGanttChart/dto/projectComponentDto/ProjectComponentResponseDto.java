@@ -6,7 +6,6 @@ import by.pirog.ReverseGanttChart.dto.membershipDto.InfoProjectMembershipDto;
 import by.pirog.ReverseGanttChart.dto.reviwerStatusDto.ReviewerTaskStatusResponseDto;
 import by.pirog.ReverseGanttChart.dto.studentStatusDto.StudentTaskStatusResponseDto;
 import by.pirog.ReverseGanttChart.dto.taskMakerDto.TaskMakerResponseDto;
-import by.pirog.ReverseGanttChart.storage.entity.ProjectMembershipEntity;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -24,11 +23,11 @@ public class ProjectComponentResponseDto {
     private String description;
     private Long projectId;
     private Long parentId;
-    private LocalDateTime createdDate;
-    private Long pos;
-    private LocalDate deadline;
+    private LocalDateTime createdAt;
 
-    private LocalDate startData;
+    private LocalDateTime deadline;
+
+    private LocalDateTime startDate;
 
     private InfoProjectMembershipDto creator;
 

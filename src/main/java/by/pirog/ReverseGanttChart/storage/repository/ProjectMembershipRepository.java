@@ -28,4 +28,9 @@ public interface ProjectMembershipRepository extends JpaRepository<ProjectMember
             "JOIN FETCH pm.userRole " +
             "where pm.user.email = :email")
     List<ProjectMembershipEntity> findAllByUserEmail(@Param("email") String email);
+
+    @Query("SELECT pm from ProjectMembershipEntity pm " +
+            "JOIN FETCH pm.project " +
+            "WHERE pm.projectUsername = :username and pm.project.id = :projectId")
+    Optional<ProjectMembershipEntity> findProjectMembershipByUsernameAndProjectId(@Param("username") String username, @Param("projectId") Long projectId);
 }

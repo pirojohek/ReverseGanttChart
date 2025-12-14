@@ -14,15 +14,6 @@ import java.util.List;
 public class ProjectComponentController {
     private final ProjectComponentService projectComponentService;
 
-
-    /*
-    при получении всех задач у проекта нужно определить задачи, которые являются корнем дерева, то есть
-    они не имеют родителей, эти задачи сортируются в порядке добавления по времени или по порядку order
-    если такой имеется, для начала сделаю по времени
-    затем он должен сформировать response, который видимо рекурсивно получается
-    начнем с создания компонентов, а уже потом с их вывода
-     */
-
     @PostMapping("/action/create")
     public ResponseEntity<CreatedProjectComponentDto> createProjectComponent(@RequestBody CreateProjectComponentDto createProjectComponentDto) {
         CreatedProjectComponentDto response = this.projectComponentService.createProjectComponent(createProjectComponentDto);

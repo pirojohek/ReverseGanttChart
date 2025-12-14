@@ -3,10 +3,10 @@ package by.pirog.ReverseGanttChart.service.reviewerTaskStatus;
 
 import by.pirog.ReverseGanttChart.dto.reviwerStatusDto.ReviewerTaskStatusResponseDto;
 import by.pirog.ReverseGanttChart.dto.reviwerStatusDto.SetReviewerTaskStatusRequestDto;
-import by.pirog.ReverseGanttChart.dto.studentStatusDto.StudentTaskStatusResponseDto;
 import by.pirog.ReverseGanttChart.exception.ProjectComponentNotFoundException;
 import by.pirog.ReverseGanttChart.exception.ReviewerTaskStatusNotFound;
-import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
+import by.pirog.ReverseGanttChart.mapper.ReviewerTaskStatusMapper;
+import by.pirog.ReverseGanttChart.security.token.CustomAuthenticationToken;
 import by.pirog.ReverseGanttChart.service.projectMembership.MembershipService;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectComponentEntity;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectMembershipEntity;
@@ -28,14 +28,15 @@ public class DefaultReviewerTaskStatusService implements ReviewerTaskStatusServi
     private final ReviewerTaskStatusRepository reviewerTaskStatusRepository;
     private final ReviewerStatusRepository reviewerStatusRepository;
 
-    // Todo - потом заменить на сервисы
     private final ProjectComponentRepository projectComponentRepository;
 
     private final MembershipService membershipService;
 
+    private final ReviewerTaskStatusMapper reviewerTaskStatusMapper;
+
     @Override
     public ReviewerTaskStatusResponseDto setReviewerTaskStatus(SetReviewerTaskStatusRequestDto dto) {
-        var token = (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         ProjectMembershipEntity membership = this.membershipService.getCurrentProjectMembership();
 
         ProjectComponentEntity projectComponent = this.projectComponentRepository
@@ -64,11 +65,6 @@ public class DefaultReviewerTaskStatusService implements ReviewerTaskStatusServi
 
         reviewerTaskStatusEntity = this.reviewerTaskStatusRepository.save(reviewerTaskStatusEntity);
 
-        return ReviewerTaskStatusResponseDto.builder()
-                .id(reviewerTaskStatusEntity.getId())
-                .reviewer(this.membershipService.parseProjectMembershipDto(membership))
-                .taskId(dto.taskId())
-                .status(dto.status())
-                .build();
+        return this.reviewerTaskStatusMapper.toReviewerTaskStatusResponseDto(reviewerTaskStatusEntity);
     }
 }

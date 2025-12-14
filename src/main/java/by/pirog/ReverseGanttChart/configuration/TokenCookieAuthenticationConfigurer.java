@@ -1,6 +1,6 @@
 package by.pirog.ReverseGanttChart.configuration;
 
-import by.pirog.ReverseGanttChart.security.DualCookieAuthenticationConverter;
+import by.pirog.ReverseGanttChart.security.AuthenticationCookieAuthenticationConverter;
 import by.pirog.ReverseGanttChart.security.detailsService.TokenUserDetailsService;
 import by.pirog.ReverseGanttChart.security.filter.LoginIntoProjectCookieAuthenticationFilter;
 import by.pirog.ReverseGanttChart.security.filter.LoginUsernamePasswordAuthenticationFilter;
@@ -97,7 +97,7 @@ public class TokenCookieAuthenticationConfigurer
     private AuthenticationFilter getAuthenticationFilter(AuthenticationManager authenticationManager) {
         var cookieAuthenticationFilter = new AuthenticationFilter(
                 authenticationManager,
-                new DualCookieAuthenticationConverter(this.tokenCookieStringDeserializer, redisTokenBlacklistService, tokenCookieNameProperties)
+                new AuthenticationCookieAuthenticationConverter(this.tokenCookieStringDeserializer, redisTokenBlacklistService, tokenCookieNameProperties)
         );
 
         cookieAuthenticationFilter.setSuccessHandler((request, response, auth) -> {

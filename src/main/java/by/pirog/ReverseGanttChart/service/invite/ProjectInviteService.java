@@ -7,10 +7,7 @@ import by.pirog.ReverseGanttChart.service.projectMembership.DefaultProjectMember
 import by.pirog.ReverseGanttChart.service.projectMembership.GetProjectMembershipByUserEmailAndProjectId;
 import by.pirog.ReverseGanttChart.service.projectMembership.MembershipService;
 import by.pirog.ReverseGanttChart.storage.entity.*;
-import by.pirog.ReverseGanttChart.storage.repository.ProjectInviteRepository;
-import by.pirog.ReverseGanttChart.storage.repository.ProjectRepository;
-import by.pirog.ReverseGanttChart.storage.repository.ProjectUserRoleRepository;
-import by.pirog.ReverseGanttChart.storage.repository.UserRepository;
+import by.pirog.ReverseGanttChart.storage.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
@@ -28,13 +25,15 @@ public class ProjectInviteService {
     private final ProjectInviteRepository projectInviteRepository;
     private final GetProjectMembershipByUserEmailAndProjectId getProjectMembershipByUserEmailAndProjectId;
 
-    // Todo - переделать уже наконец то все под сервисы
+
     private final ProjectRepository projectRepository;
-    private final MembershipService membershipService;
     private final UserRepository userRepository;
     private final ProjectUserRoleRepository projectUserRoleRepository;
+    private final ProjectMembershipRepository projectMembershipRepository;
+
 
     private final EmailService emailService;
+    private final MembershipService membershipService;
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
@@ -88,12 +87,17 @@ public class ProjectInviteService {
     }
 
 
-    public void acceptInvitation(String token) {
+    public void acceptInvitation(String token, String username) {
         ProjectInviteEntity invite = this.projectInviteRepository.findProjectInviteEntityByToken(token)
                 .orElseThrow(() -> new InviteTokenException("Token not found or expired"));
 
-        // Todo - добавить проверку истек токен или нет
+        if (this.projectMembershipRepository
+                .findProjectMembershipByUsernameAndProjectId(username, invite.getProject().getId()).isPresent()) {
+            throw new IllegalArgumentException("User with username " + username + " already exists");
+        }
 
+        // Todo - добавить проверку истек токен или нет
+        // Todo - еще проверка на статус нужна и тд.
         ProjectMembershipEntity projectMembership = ProjectMembershipEntity.builder()
                 .project(invite.getProject())
                 .user(invite.getUser())

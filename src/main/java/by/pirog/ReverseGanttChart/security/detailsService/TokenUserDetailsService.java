@@ -20,8 +20,8 @@ public class TokenUserDetailsService implements AuthenticationUserDetailsService
     @Override
     public UserDetails loadUserDetails(PreAuthenticatedAuthenticationToken token) throws UsernameNotFoundException {
         Token authentication = (Token) token.getCredentials();
-
-        UserEntity userEntity = userRepository.findByEmail(authentication.subject())
+        // Здесь по идее тоже интересный момент, потому что нужно искать и по email и по username
+        UserEntity userEntity = userRepository.findByUsername(authentication.subject())
                 .orElseThrow(() -> new UsernameNotFoundException("Invalid username or password"));
 
         return new CustomUserDetails(userEntity, authentication);

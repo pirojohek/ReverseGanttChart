@@ -1,8 +1,7 @@
 package by.pirog.ReverseGanttChart.security.securityService.authService;
 
-import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
+import by.pirog.ReverseGanttChart.security.token.CustomAuthenticationToken;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,11 +21,10 @@ public class ProjectSecurityService {
     }
 
     public boolean hasProjectAccess(Authentication authentication, HttpServletRequest request) {
-        if (!(authentication instanceof DualPreAuthenticatedAuthenticationToken)) {
+        if (!(authentication instanceof CustomAuthenticationToken userToken)) {
             return false;
         }
 
-        var userToken =  (DualPreAuthenticatedAuthenticationToken) authentication;
         Long userProjectId = userToken.getProjectId();
         Long requestProjectId = Long.valueOf(request.getParameter("projectId"));
 
@@ -39,24 +37,22 @@ public class ProjectSecurityService {
 
     public boolean hasProjectAccessWithRole(Authentication authentication, HttpServletRequest request,
                                             String role) {
-        if (!(authentication instanceof DualPreAuthenticatedAuthenticationToken)) {
+        if (!(authentication instanceof CustomAuthenticationToken userToken)) {
             return false;
         }
 
-        var userToken =  (DualPreAuthenticatedAuthenticationToken) authentication;
-        return hasProjectAccess(authentication, request) && userToken.getGrantedAuthorities().stream()
+        return hasProjectAccess(authentication, request) && userToken.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList().contains(role);
     }
 
     public boolean hasProjectAccessWithMinRole(Authentication authentication, HttpServletRequest request,
                                                String role) {
-        if (!(authentication instanceof DualPreAuthenticatedAuthenticationToken)) {
+        if (!(authentication instanceof CustomAuthenticationToken userToken)) {
             return false;
         }
 
-        var userToken =  (DualPreAuthenticatedAuthenticationToken) authentication;
-        boolean hasRoleAccess = userToken.getGrantedAuthorities().stream()
+        boolean hasRoleAccess = userToken.getAuthorities().stream()
                 .anyMatch(r -> hasRoleWithHierarchy(r.getAuthority(), role));
         return hasRoleAccess && hasProjectAccess(authentication, request);
     }

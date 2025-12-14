@@ -1,10 +1,9 @@
 package by.pirog.ReverseGanttChart.security.factory;
 
-import by.pirog.ReverseGanttChart.security.enums.TokenType;
+import by.pirog.ReverseGanttChart.enums.TokenType;
 import by.pirog.ReverseGanttChart.security.token.Token;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectMembershipEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import lombok.Setter;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -14,7 +13,7 @@ import java.util.function.Function;
 
 public class ProjectTokenCookieFactory implements Function<ProjectMembershipEntity, Token> {
 
-
+    @Setter
     private Duration tokenTtl = Duration.ofDays(1);
 
     @Override
@@ -25,9 +24,4 @@ public class ProjectTokenCookieFactory implements Function<ProjectMembershipEnti
                 List.of(projectMembership.getUserRole().getRoleName()), projectMembership.getProject().getId(),
                 TokenType.PROJECT, now, now.plus(tokenTtl));
     }
-
-    public void setTokenTtl(Duration tokenTtl) {
-        this.tokenTtl = tokenTtl;
-    }
-
 }

@@ -2,8 +2,8 @@ package by.pirog.ReverseGanttChart.controller;
 
 import by.pirog.ReverseGanttChart.dto.membershipDto.AddProjectMembershipDto;
 import by.pirog.ReverseGanttChart.dto.membershipDto.InfoProjectMembershipDto;
-import by.pirog.ReverseGanttChart.dto.membershipDto.ResponseUserMembershipMeDto;
-import by.pirog.ReverseGanttChart.security.enums.UserRole;
+import by.pirog.ReverseGanttChart.dto.membershipDto.ProjectMembershipUserProjectsResponseDto;
+import by.pirog.ReverseGanttChart.enums.UserRole;
 import by.pirog.ReverseGanttChart.service.projectMembership.MembershipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,19 +18,15 @@ import java.util.List;
 public class MembershipController {
     private final MembershipService membershipService;
 
-    @GetMapping("/me")
-    public ResponseEntity<ResponseUserMembershipMeDto> userMembershipMe(){
-        ResponseUserMembershipMeDto response = this.membershipService.getInfoAboutCurrentMembership();
-        return ResponseEntity.ok(response);
-    }
 
     // Возвращает все проекты, в которых участвует пользователь
     @GetMapping
-    public ResponseEntity<List<ResponseUserMembershipMeDto>> getAllUserMemberships(){
-        List<ResponseUserMembershipMeDto> response = this.membershipService.getAllUserMemberships();
+    public ResponseEntity<List<ProjectMembershipUserProjectsResponseDto>> getAllUserMemberships(){
+        List<ProjectMembershipUserProjectsResponseDto> response = this.membershipService.getAllUserMemberships();
 
         return ResponseEntity.ok(response);
     }
+
     // Todo перед продом запретить этот эндпоинт
     @PostMapping("/action/add")
     public ResponseEntity<Void> addProjectMembership(@RequestBody AddProjectMembershipDto projectMembershipDto) {

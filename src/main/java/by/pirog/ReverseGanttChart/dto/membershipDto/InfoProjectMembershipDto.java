@@ -13,4 +13,5 @@ public class InfoProjectMembershipDto {
     private String email;
     private String userRole;
     private Long projectId;
+    private String username;
 }

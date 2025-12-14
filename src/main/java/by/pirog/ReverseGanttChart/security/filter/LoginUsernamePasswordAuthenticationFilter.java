@@ -66,12 +66,12 @@ public class LoginUsernamePasswordAuthenticationFilter extends UsernamePasswordA
                     LoginRequestDto.class
             );
 
-            if (loginRequestDto.password() == null || loginRequestDto.email() == null) {
-                throw new AuthenticationServiceException("Email and password are required");
+            if (loginRequestDto.password() == null || loginRequestDto.username() == null) {
+                throw new AuthenticationServiceException("Username or email and password are required");
             }
-
+            // короче при логине сделаю так, чтобы можно было войти по логину или почте
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                    loginRequestDto.email().trim(),
+                    loginRequestDto.username().trim(),
                     loginRequestDto.password().trim()
             );
 

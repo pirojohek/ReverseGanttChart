@@ -2,6 +2,8 @@ package by.pirog.ReverseGanttChart.service.taskMakers;
 
 import by.pirog.ReverseGanttChart.dto.membershipDto.InfoProjectMembershipDto;
 import by.pirog.ReverseGanttChart.dto.taskMakerDto.TakenTaskResponseDto;
+import by.pirog.ReverseGanttChart.mapper.ProjectMembershipMapper;
+import by.pirog.ReverseGanttChart.mapper.TaskMakerMapper;
 import by.pirog.ReverseGanttChart.service.projectComponent.ProjectComponentEntityService;
 import by.pirog.ReverseGanttChart.service.projectComponent.ProjectComponentService;
 import by.pirog.ReverseGanttChart.service.projectMembership.MembershipService;
@@ -27,6 +29,8 @@ public class DefaultTaskMakersService implements TaskMakersService {
     private final MembershipService membershipService;
 
     private final ProjectComponentEntityService projectComponentEntityService;
+
+    private final ProjectMembershipMapper projectMembershipMapper;
 
     @Override
     public List<TakenTaskResponseDto> takeTasksToMake(Long taskId, Boolean subtasks) {
@@ -76,7 +80,6 @@ public class DefaultTaskMakersService implements TaskMakersService {
     private void collectAssignedTasks(ProjectComponentEntity node,
                                       ProjectMembershipEntity membership,
                                       List<TakenTaskResponseDto> result) {
-
         if (node == null) {
             return;
         }
@@ -90,21 +93,13 @@ public class DefaultTaskMakersService implements TaskMakersService {
     private TakenTaskResponseDto convertToDto(ProjectComponentEntity projectComponentEntity,
                                                                 ProjectMembershipEntity projectMembershipEntity) {
         return TakenTaskResponseDto.builder()
-                .taskMaker(getProjectMembershipAsDto(projectMembershipEntity))
+                .taskMaker(this.projectMembershipMapper.toInfoProjectMembershipDto(projectMembershipEntity))
                 .taskId(projectComponentEntity.getId())
                 .build();
     }
 
-    private InfoProjectMembershipDto getProjectMembershipAsDto(ProjectMembershipEntity projectMembershipEntity) {
-        // Todo оптимизировать
-        return InfoProjectMembershipDto.builder()
-                .email(projectMembershipEntity.getUser().getEmail())
-                .userRole(projectMembershipEntity.getUserRole().getRoleName())
-                .projectId(projectMembershipEntity.getProject().getId())
-                .build();
-    }
     private void assignToComponent(ProjectMembershipEntity membership, ProjectComponentEntity projectComponent) {
-        // Todo - нужно сделать проверку перед добавлением, чтобы не добавлялся пользователь несколько раз
+
         Optional<TaskMakerEntity> maker = this.taskMakerRepository.findTaskMakerEntityByMembershipIdAndProjectComponentId(membership.getId(), projectComponent.getId());
 
         if (maker.isEmpty()){

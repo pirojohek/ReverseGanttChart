@@ -27,4 +27,7 @@ public class ProjectMembershipEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="c_user")
     private UserEntity user;
+
+    @Column(name = "c_project_username")
+    private String projectUsername;
 }

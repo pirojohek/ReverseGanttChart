@@ -1,6 +1,6 @@
 package by.pirog.ReverseGanttChart.security.token;
 
-import by.pirog.ReverseGanttChart.security.enums.TokenType;
+import by.pirog.ReverseGanttChart.enums.TokenType;
 
 import java.time.Instant;
 import java.util.List;

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -14,7 +15,7 @@ public class UpdatedProjectComponentResponseDto {
 
     private String description;
 
-    private LocalDate deadline;
+    private LocalDateTime deadline;
 
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public record CreateProjectComponentDto(
 
@@ -17,10 +18,15 @@ public record CreateProjectComponentDto(
         Long parentId,
 
         @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate deadline,
+        LocalDate deadlineDate,
 
+        @JsonFormat(pattern = "HH:mm:ss")
+        LocalTime deadlineTime,
 
         @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate startDate
+        LocalDate startDate,
+
+        @JsonFormat(pattern = "HH:mm:ss")
+        LocalTime startTime
 ) {
 }

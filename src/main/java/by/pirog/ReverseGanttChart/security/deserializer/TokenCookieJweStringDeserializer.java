@@ -1,7 +1,7 @@
 package by.pirog.ReverseGanttChart.security.deserializer;
 
 import by.pirog.ReverseGanttChart.exception.ExpiredTokenException;
-import by.pirog.ReverseGanttChart.security.enums.TokenType;
+import by.pirog.ReverseGanttChart.enums.TokenType;
 import by.pirog.ReverseGanttChart.security.token.Token;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEDecrypter;

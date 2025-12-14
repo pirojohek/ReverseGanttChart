@@ -38,17 +38,10 @@ public class BlacklistLogoutHandler implements LogoutHandler {
     private void invalidateJwtTokens(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String authToken = getCookieValue(request, this.tokenCookieNameProperties.getAuthCookieName());
 
-        String projectToken = getCookieValue(request, this.tokenCookieNameProperties.getProjectCookieName());
-
         if (authToken != null){
             blacklistService.addToBlackListAuthToken(authToken);
         } else {
             log.warn("Auth token не найден в запросе на logout");
-        }
-        if (projectToken != null){
-            blacklistService.addToBlacklistProjectToken(projectToken);
-        } else {
-            log.warn("Project token не найден в запросе на logout");
         }
 
     }

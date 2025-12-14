@@ -1,7 +1,7 @@
 package by.pirog.ReverseGanttChart.service.projectComponent;
 
 import by.pirog.ReverseGanttChart.exception.ProjectComponentParentNotFound;
-import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
+import by.pirog.ReverseGanttChart.security.token.CustomAuthenticationToken;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectComponentEntity;
 import by.pirog.ReverseGanttChart.storage.repository.ProjectComponentRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class DefaultProjectComponentEntityService implements ProjectComponentEnt
     public ProjectComponentEntity getProjectComponentByProjectIdAndComponentIdWithHierarchyAndTaskMakers
             (Long componentId) {
 
-        var token = (DualPreAuthenticatedAuthenticationToken)
+        var token = (CustomAuthenticationToken)
                 SecurityContextHolder.getContext().getAuthentication();
 
         ProjectComponentEntity parentComponent = this.projectComponentRepository.findProjectComponentEntityByProjectIdAndComponentIdWithTaskMakers(componentId, token.getProjectId())
@@ -36,7 +36,7 @@ public class DefaultProjectComponentEntityService implements ProjectComponentEnt
 
     @Override
     public ProjectComponentEntity getProjectComponentByProjectIdAndComponentIdWithTaskMakers(Long componentId) {
-        var token = (DualPreAuthenticatedAuthenticationToken)
+        var token = (CustomAuthenticationToken)
                 SecurityContextHolder.getContext().getAuthentication();
 
         return this.projectComponentRepository.findProjectComponentEntityByProjectIdAndComponentIdWithTaskMakers(componentId, token.getProjectId())

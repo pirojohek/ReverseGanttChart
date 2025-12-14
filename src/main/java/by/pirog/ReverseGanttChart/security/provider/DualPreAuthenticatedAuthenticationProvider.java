@@ -1,7 +1,6 @@
 package by.pirog.ReverseGanttChart.security.provider;
 
-import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
-import lombok.Setter;
+import by.pirog.ReverseGanttChart.security.token.CustomAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.AuthenticationUserDetailsService;
@@ -20,9 +19,6 @@ public class DualPreAuthenticatedAuthenticationProvider extends PreAuthenticated
         if (!supports(authentication.getClass())) {
             return null;
         }
-        if (!(authentication instanceof DualPreAuthenticatedAuthenticationToken)) {
-            return delegateAuthenticationProvider.authenticate(authentication);
-        }
         if (authentication.getPrincipal() == null) {
             return null;
         }
@@ -31,9 +27,7 @@ public class DualPreAuthenticatedAuthenticationProvider extends PreAuthenticated
         }
         UserDetails userDetails = this.preAuthenticatedUserDetailsService
                 .loadUserDetails((PreAuthenticatedAuthenticationToken) authentication);
-        var dualToken = (DualPreAuthenticatedAuthenticationToken) authentication;
-        var token = new DualPreAuthenticatedAuthenticationToken(userDetails,dualToken.getAuthenticationAuth(), dualToken.getProjectAuth());
-
+        var token = new CustomAuthenticationToken(userDetails, authentication);
         token.setDetails(userDetails);
         token.setAuthenticated(true);
         return token;

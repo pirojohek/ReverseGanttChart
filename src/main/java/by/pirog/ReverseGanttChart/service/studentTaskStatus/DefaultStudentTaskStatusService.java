@@ -3,10 +3,10 @@ package by.pirog.ReverseGanttChart.service.studentTaskStatus;
 import by.pirog.ReverseGanttChart.dto.studentStatusDto.SetTaskStatusRequestDto;
 import by.pirog.ReverseGanttChart.dto.studentStatusDto.StudentTaskStatusResponseDto;
 import by.pirog.ReverseGanttChart.exception.ProjectComponentNotFoundException;
-import by.pirog.ReverseGanttChart.exception.ProjectComponentParentNotFound;
 import by.pirog.ReverseGanttChart.exception.TaskStatusNotFoundException;
 import by.pirog.ReverseGanttChart.exception.UserIsNotTaskMakerException;
-import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
+import by.pirog.ReverseGanttChart.mapper.StudentTaskStatusMapper;
+import by.pirog.ReverseGanttChart.security.token.CustomAuthenticationToken;
 import by.pirog.ReverseGanttChart.service.projectMembership.MembershipService;
 import by.pirog.ReverseGanttChart.storage.entity.*;
 import by.pirog.ReverseGanttChart.storage.repository.ProjectComponentRepository;
@@ -26,16 +26,16 @@ public class DefaultStudentTaskStatusService implements StudentTaskStatusService
     private final TaskStatusRepository taskStatusRepository;
     private final StudentTaskStatusRepository studentTaskStatusRepository;
 
-    // Todo - переделать эту штуку под сервис потом
     private final TaskMakerRepository taskMakerRepository;
     private final ProjectComponentRepository projectComponentRepository;
 
     private final MembershipService membershipService;
 
+    private final StudentTaskStatusMapper studentTaskStatusMapper;
 
     @Override
     public StudentTaskStatusResponseDto setTaskStatus(SetTaskStatusRequestDto dto) {
-        var token = (DualPreAuthenticatedAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         ProjectMembershipEntity membership = this.membershipService.getCurrentProjectMembership();
 
         ProjectComponentEntity projectComponent = this.projectComponentRepository
@@ -72,11 +72,6 @@ public class DefaultStudentTaskStatusService implements StudentTaskStatusService
 
         studentTaskStatusEntity = studentTaskStatusRepository.save(studentTaskStatusEntity);
 
-        return StudentTaskStatusResponseDto.builder()
-                .id(studentTaskStatusEntity.getId())
-                .student(this.membershipService.parseProjectMembershipDto(membership))
-                .taskId(dto.taskId())
-                .status(dto.status())
-                .build();
+        return this.studentTaskStatusMapper.toStudentTaskStatusDto(studentTaskStatusEntity);
     }
 }

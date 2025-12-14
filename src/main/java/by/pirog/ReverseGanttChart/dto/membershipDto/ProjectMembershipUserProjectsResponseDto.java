@@ -1,5 +1,6 @@
 package by.pirog.ReverseGanttChart.dto.membershipDto;
 
+import by.pirog.ReverseGanttChart.enums.ProjectStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,14 +12,18 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseUserMembershipMeDto {
+public class ProjectMembershipUserProjectsResponseDto {
     private String email;
     private Long projectId;
     private String role;
+
+    private String username;
 
     private String projectName;
 
     private String projectDescription;
 
     private LocalDate deadline;
+
+    private ProjectStatus projectStatus;
 }

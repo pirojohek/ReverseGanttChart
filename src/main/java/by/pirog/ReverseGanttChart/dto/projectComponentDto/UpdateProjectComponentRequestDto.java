@@ -2,6 +2,7 @@ package by.pirog.ReverseGanttChart.dto.projectComponentDto;
 
 import lombok.Builder;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Builder
 public record UpdateProjectComponentRequestDto(
@@ -11,9 +12,12 @@ public record UpdateProjectComponentRequestDto(
 
         String description,
 
-        LocalDate deadline,
+        LocalDate deadlineDate,
 
-        LocalDate startDate
+        LocalTime deadlineTime,
+
+        LocalDate startDate,
+        LocalTime startTime
 ) {
     public boolean hasTitle() {
         return title != null;
@@ -23,11 +27,18 @@ public record UpdateProjectComponentRequestDto(
         return description != null;
     }
 
-    public boolean hasDeadline() {
-        return deadline != null;
+    public boolean hasDeadlineDate() {
+        return deadlineDate != null;
+    }
+
+    public boolean hasDeadlineTime() {
+        return deadlineTime != null;
     }
 
     public boolean hasStartDate() {
         return startDate != null;
+    }
+    public boolean hasStartTime() {
+        return startTime != null;
     }
 }

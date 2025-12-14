@@ -2,7 +2,7 @@ package by.pirog.ReverseGanttChart.configuration;
 
 import by.pirog.ReverseGanttChart.security.deserializer.TokenCookieJweStringDeserializer;
 import by.pirog.ReverseGanttChart.security.detailsService.CustomUserDetailsService;
-import by.pirog.ReverseGanttChart.security.enums.UserRole;
+import by.pirog.ReverseGanttChart.enums.UserRole;
 import by.pirog.ReverseGanttChart.security.factory.AuthorizationManagerFactory;
 import by.pirog.ReverseGanttChart.security.filter.LoginIntoProjectCookieAuthenticationFilter;
 import by.pirog.ReverseGanttChart.security.securityService.blacklistService.RedisTokenBlacklistService;

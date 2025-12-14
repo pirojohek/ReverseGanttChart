@@ -9,8 +9,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix="app.security.cookie")
 @Data
 public class TokenCookieNameProperties {
-
-    private String projectCookieName;
-
     private String authCookieName;
 }

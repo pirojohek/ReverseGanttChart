@@ -2,7 +2,6 @@ package by.pirog.ReverseGanttChart.security;
 
 import by.pirog.ReverseGanttChart.configuration.TokenCookieNameProperties;
 import by.pirog.ReverseGanttChart.security.securityService.blacklistService.RedisTokenBlacklistService;
-import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
 import by.pirog.ReverseGanttChart.security.token.Token;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,9 +13,8 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class DualCookieAuthenticationConverter implements AuthenticationConverter {
+public class AuthenticationCookieAuthenticationConverter implements AuthenticationConverter {
 
     private final Function<String, Token> tokenCookieStringDeserializer;
 
@@ -24,9 +22,9 @@ public class DualCookieAuthenticationConverter implements AuthenticationConverte
 
     private final TokenCookieNameProperties tokenCookieNameProperties;
 
-    public DualCookieAuthenticationConverter(Function<String, Token> tokenCookieStringDeserializer,
-                                             RedisTokenBlacklistService tokenBlacklistService,
-                                             TokenCookieNameProperties tokenCookieNameProperties) {
+    public AuthenticationCookieAuthenticationConverter(Function<String, Token> tokenCookieStringDeserializer,
+                                                       RedisTokenBlacklistService tokenBlacklistService,
+                                                       TokenCookieNameProperties tokenCookieNameProperties) {
         this.tokenCookieStringDeserializer = tokenCookieStringDeserializer;
         this.tokenBlacklistService = tokenBlacklistService;
         this.tokenCookieNameProperties = tokenCookieNameProperties;
@@ -35,15 +33,10 @@ public class DualCookieAuthenticationConverter implements AuthenticationConverte
     @Override
     public Authentication convert(HttpServletRequest request) {
         boolean isAuthenticationTokenInBlacklist = checkAuthenticationTokenInBlacklist(request);
-        boolean isProjectTokenInBlacklist = checkProjectTokenInBlacklist(request);
-
         Authentication authenticationAuth = extractAuthenticationTokenToAuth(request);
-        Authentication projectAuth = extractProjectTokenToAuth(request);
 
 
-        if (authenticationAuth != null && !isAuthenticationTokenInBlacklist && projectAuth != null && !isProjectTokenInBlacklist) {
-            return new DualPreAuthenticatedAuthenticationToken(authenticationAuth, projectAuth);
-        } else if (authenticationAuth != null && !isAuthenticationTokenInBlacklist) {
+        if (authenticationAuth != null && !isAuthenticationTokenInBlacklist) {
             return new PreAuthenticatedAuthenticationToken
                     (authenticationAuth.getPrincipal(), authenticationAuth.getCredentials(),
                             authenticationAuth.getAuthorities());
@@ -56,22 +49,9 @@ public class DualCookieAuthenticationConverter implements AuthenticationConverte
                 (getCookieValue(request, tokenCookieNameProperties.getAuthCookieName()));
      }
 
-     private boolean checkProjectTokenInBlacklist(HttpServletRequest request) {
-        return tokenBlacklistService.isProjectTokenBlacklisted
-                (getCookieValue(request, tokenCookieNameProperties.getProjectCookieName()));
-     }
 
     private Authentication extractAuthenticationTokenToAuth(HttpServletRequest request){
         String tokenString = getCookieValue(request, tokenCookieNameProperties.getAuthCookieName());
-        if (tokenString != null){
-            var token =  tokenCookieStringDeserializer.apply(tokenString);
-            return createAuthenticationToken(token);
-        }
-        return null;
-    }
-
-    private Authentication extractProjectTokenToAuth(HttpServletRequest request){
-        String tokenString = getCookieValue(request, tokenCookieNameProperties.getProjectCookieName());
         if (tokenString != null){
             var token =  tokenCookieStringDeserializer.apply(tokenString);
             return createAuthenticationToken(token);

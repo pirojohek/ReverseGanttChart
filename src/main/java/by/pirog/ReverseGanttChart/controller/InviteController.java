@@ -19,8 +19,7 @@ public class InviteController {
 
     @PostMapping("/send")
     public ResponseEntity<InviteResponseDto> sendInvite(
-            @Valid @RequestBody InviteRequestDto inviteRequestDto,
-            BindingResult bindingResult
+            @Valid @RequestBody InviteRequestDto inviteRequestDto
     ) {
         projectInviteService.sendInvitation(inviteRequestDto);
 
@@ -28,8 +27,9 @@ public class InviteController {
     }
 
     @PostMapping("/accept")
-    public ResponseEntity<Void> acceptInvite(@RequestParam("token") String token){
-        this.projectInviteService.acceptInvitation(token);
+    public ResponseEntity<Void> acceptInvite(@RequestParam("token") String token,
+                                             @RequestParam("username") String username){
+        this.projectInviteService.acceptInvitation(token, username);
         return ResponseEntity.ok(null);
     }
 }

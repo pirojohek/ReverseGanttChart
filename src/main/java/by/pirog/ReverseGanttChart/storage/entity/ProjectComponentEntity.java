@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -74,24 +72,38 @@ public class ProjectComponentEntity {
     private Set<CommentEntity> comments = new HashSet<>();
 
     // Методы для работы с датами и добавления taskMaker
-    public void setDeadlineFromLocalDate(LocalDate date) {
-        this.deadline = date == null ? null : date.atStartOfDay(ZoneOffset.UTC).toInstant();
+    public void setDeadlineFromLocalDateAndTime(LocalDate date, LocalTime time){
+        this.deadline = Instant.from(LocalDateTime.of(date, time));
     }
 
-    public void setStartDateFromLocalDate(LocalDate date) {
-        this.startDate = date == null ? null : date.atStartOfDay(ZoneOffset.UTC).toInstant();
+    public void setDeadlineFromLocalDate(LocalDate localDate){
+        this.deadline = Instant.from(LocalDateTime.of(localDate, LocalTime.MIN));
     }
 
-    public LocalDate getDeadlineAsLocalDate() {
-        return deadline == null ? null : LocalDate.ofInstant(deadline, ZoneOffset.UTC);
+    public void setStartDateFromLocalDate(LocalDate date){
+        this.startDate = Instant.from(LocalDateTime.of(date, LocalTime.MIN));
     }
 
-    public LocalDate getStartDateAsLocalDate() {
-        return startDate == null ? null : LocalDate.ofInstant(startDate, ZoneOffset.UTC);
+    public void setStartDateFromLocalDateAndTime(LocalDate date, LocalTime time){
+        this.startDate = Instant.from(LocalDateTime.of(date, time));
     }
 
-    public LocalDate getCreatedAtAsLocalDate() {
-        return createdAt == null ? null : LocalDate.ofInstant(createdAt, ZoneOffset.UTC);
+    public LocalDateTime getCreatedAtAsLocalDateTime() {
+        return createdAt != null
+                ? LocalDateTime.ofInstant(createdAt, ZoneId.systemDefault())
+                : null;
+    }
+
+    public LocalDateTime getStartDateAsLocalDateTime(){
+        return startDate != null
+                ? LocalDateTime.ofInstant(startDate, ZoneId.systemDefault())
+                : null;
+    }
+
+    public LocalDateTime getDeadlineAsLocalDateTime(){
+        return deadline != null
+                ? LocalDateTime.ofInstant(deadline, ZoneId.systemDefault())
+                : null;
     }
 
     public void addTaskMaker(TaskMakerEntity taskMaker){

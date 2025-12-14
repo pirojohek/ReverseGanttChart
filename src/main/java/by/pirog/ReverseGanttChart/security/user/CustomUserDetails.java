@@ -26,17 +26,15 @@ public class CustomUserDetails implements UserDetails {
 
     @Getter
     private Token token;
-
     @Getter
     private UserEntity user;
-
 
     private Collection<GrantedAuthority> authorities;
 
     public CustomUserDetails(UserEntity user) {
         this.id = user.getId();
         this.password = user.getPassword();
-        this.username = user.getEmail();
+        this.username = user.getUsername();
         this.email = user.getEmail();
         this.authorities = List.of();
         this.token = null;
@@ -45,7 +43,7 @@ public class CustomUserDetails implements UserDetails {
 
     public CustomUserDetails(UserEntity user, Token token) {
         this.id = user.getId();
-        this.username = user.getEmail();
+        this.username = user.getUsername();
         this.email = user.getEmail();
         this.password = null;
         this.token = token;
@@ -89,5 +87,4 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
-
 }

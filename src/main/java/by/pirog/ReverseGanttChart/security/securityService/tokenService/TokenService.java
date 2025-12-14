@@ -36,7 +36,7 @@ public class TokenService implements ResponseCookieProjectToken, ResponseCookieU
         var projectTokenCookie = this.projectTokenFactory.apply(projectMembershipEntity);
         var projectTokenSerialized = this.tokenStringSerializer.apply(projectTokenCookie);
 
-        return ResponseCookie.from(tokenCookieNameProperties.getProjectCookieName(), projectTokenSerialized)
+        return ResponseCookie.from(tokenCookieNameProperties.getAuthCookieName(), projectTokenSerialized)
                 .httpOnly(true)
                 .path("/")
                 .maxAge((int) ChronoUnit.SECONDS.between(Instant.now(), projectTokenCookie.expiresAt()))

@@ -3,7 +3,7 @@ package by.pirog.ReverseGanttChart.service.project;
 import by.pirog.ReverseGanttChart.dto.projectDto.*;
 import by.pirog.ReverseGanttChart.exception.DefaultServerException;
 import by.pirog.ReverseGanttChart.exception.ProjectNotFoundException;
-import by.pirog.ReverseGanttChart.security.token.DualPreAuthenticatedAuthenticationToken;
+import by.pirog.ReverseGanttChart.security.token.CustomAuthenticationToken;
 import by.pirog.ReverseGanttChart.security.user.CustomUserDetails;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectEntity;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectMembershipEntity;
@@ -15,10 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.rmi.UnexpectedException;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.Optional;
 
 
@@ -36,11 +34,11 @@ public class DefaultProjectService implements ProjectService, ProjectEntityServi
     public CreatedProjectDto createProject(CreateProjectDto projectDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        CustomUserDetails userDetails =(CustomUserDetails) authentication.getDetails();
 
         ProjectEntity project = projectRepository.save(ProjectEntity.builder()
                         .projectName(projectDto.projectName())
-                        .projectOwner(customUserDetails.getUser())
+                        .projectOwner(userDetails.getUser())
                         .projectDescription(projectDto.description())
                         .createdAt(Instant.now())
                 .build());
@@ -48,11 +46,12 @@ public class DefaultProjectService implements ProjectService, ProjectEntityServi
 
         ProjectMembershipEntity projectMembershipEntity = projectMembershipRepository.save(ProjectMembershipEntity.builder()
                 .project(project)
-                .user(customUserDetails.getUser())
+                .user(userDetails.getUser())
+                        .projectUsername(userDetails.getUser().getUsername())
                 .userRole(projectUserRoleRepository.findProjectUserRoleEntityByRoleName("ROLE_ADMIN")
                         .orElseThrow(() -> new DefaultServerException("Something went wrong")))
                 .build());
-
+        // Todo - это тоже можно вынести в mapper
         return CreatedProjectDto.builder()
                 .projectDescription(project.getProjectDescription())
                 .projectName(project.getProjectName())
@@ -65,14 +64,14 @@ public class DefaultProjectService implements ProjectService, ProjectEntityServi
 
     @Override
     public void deleteProject() {
-        var token = (DualPreAuthenticatedAuthenticationToken)
+        var token = (CustomAuthenticationToken)
                 SecurityContextHolder.getContext().getAuthentication();
         this.projectRepository.deleteById(token.getProjectId());
     }
 
     @Override
     public UpdatedProjectDto updateProject(UpdateProjectDto dto) {
-        var token = (DualPreAuthenticatedAuthenticationToken)
+        var token = (CustomAuthenticationToken)
                 SecurityContextHolder.getContext().getAuthentication();
 
         ProjectEntity project = projectRepository.findById(token.getProjectId())
@@ -99,12 +98,14 @@ public class DefaultProjectService implements ProjectService, ProjectEntityServi
 
     @Override
     public ProjectInfoDto getProjectInfo() {
-        var token = (DualPreAuthenticatedAuthenticationToken)
+        var token = (CustomAuthenticationToken)
                 SecurityContextHolder.getContext().getAuthentication();
 
         var project = projectRepository.findById(token.getProjectId())
                 .orElseThrow(() -> new ProjectNotFoundException("Project not found " + token.getProjectId()));
 
+
+        // Todo - вынести в mapper
         return ProjectInfoDto.builder()
                 .projectName(project.getProjectName())
                 .projectOwnerEmail(project.getProjectOwner().getEmail())

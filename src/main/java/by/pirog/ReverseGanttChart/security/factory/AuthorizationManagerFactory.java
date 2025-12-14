@@ -1,15 +1,9 @@
 package by.pirog.ReverseGanttChart.security.factory;
 
-import by.pirog.ReverseGanttChart.security.enums.UserRole;
 import by.pirog.ReverseGanttChart.security.securityService.authService.ProjectSecurityService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationContext;
-import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
-import org.springframework.security.web.FilterInvocation;
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
-import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.stereotype.Component;
 
