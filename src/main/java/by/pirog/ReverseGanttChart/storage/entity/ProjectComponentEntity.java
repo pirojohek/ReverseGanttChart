@@ -46,6 +46,7 @@ public class ProjectComponentEntity {
     private Instant createdAt;
 
     @Column(name = "c_global_status")
+    @Enumerated(EnumType.STRING)
     private GlobalTaskStatus globalTaskStatus;
 
     @Column(name = "c_deadline")

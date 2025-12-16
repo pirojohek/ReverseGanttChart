@@ -6,5 +6,6 @@ public enum GlobalTaskStatus {
     COMPLETED,
     IT_IS_TIME,
     REJECTED,
-    DELAYED
+    DELAYED,
+    PLANNED // статус при создании
 }

@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,4 +65,15 @@ public interface ProjectComponentRepository extends JpaRepository<ProjectCompone
     ProjectComponentEntity findProjectComponentEntityById(Long id);
 
 
+    // ============ ЗАПРОСЫ ДЛЯ SCHEDULER ===============
+    @Query("SELECT pc FROM ProjectComponentEntity pc " +
+            "WHERE pc.startDate <= :now " +
+            "AND pc.globalTaskStatus = 'PLANNED' ")
+    List<ProjectComponentEntity> findProjectComponentWhereTimeToDo(Instant now);
+
+    @Query("SELECT pc FROM ProjectComponentEntity pc " +
+            "WHERE pc.deadline <= :now " +
+            "AND pc.globalTaskStatus IN ('DELAYED', 'IT_IS_TIME', 'IN_PROGRESS',\n" +
+            "    'REJECTED')")
+    List<ProjectComponentEntity> findProjectComponentWhereDeadlineIsOver(Instant now);
 }

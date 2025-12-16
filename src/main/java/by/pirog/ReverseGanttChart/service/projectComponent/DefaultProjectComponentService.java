@@ -1,6 +1,7 @@
 package by.pirog.ReverseGanttChart.service.projectComponent;
 
 import by.pirog.ReverseGanttChart.dto.projectComponentDto.*;
+import by.pirog.ReverseGanttChart.enums.GlobalTaskStatus;
 import by.pirog.ReverseGanttChart.exception.ProjectComponentNotFoundException;
 import by.pirog.ReverseGanttChart.exception.ProjectComponentParentNotFound;
 import by.pirog.ReverseGanttChart.exception.ProjectNotFoundException;
@@ -70,7 +71,7 @@ public class DefaultProjectComponentService implements ProjectComponentService {
         if (entity.getStartDate().isBefore(Instant.now())){
             throw new ValidationException("start date is before now");
         }
-
+        entity.setGlobalTaskStatus(GlobalTaskStatus.PLANNED);
         entity = this.projectComponentRepository.save(entity);
 
         return this.projectComponentMapper.toCreatedProjectComponentDto(entity);
