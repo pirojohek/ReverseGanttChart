@@ -8,22 +8,17 @@ import by.pirog.ReverseGanttChart.exception.*;
 import by.pirog.ReverseGanttChart.mapper.InviteMapper;
 import by.pirog.ReverseGanttChart.security.token.CustomAuthenticationToken;
 import by.pirog.ReverseGanttChart.service.email.EmailService;
-import by.pirog.ReverseGanttChart.service.projectMembership.DefaultProjectMembershipService;
-import by.pirog.ReverseGanttChart.service.projectMembership.GetProjectMembershipByUserEmailAndProjectId;
 import by.pirog.ReverseGanttChart.service.projectMembership.MembershipService;
 import by.pirog.ReverseGanttChart.storage.entity.*;
 import by.pirog.ReverseGanttChart.storage.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,8 +28,6 @@ import java.util.UUID;
 public class ProjectInviteService {
 
     private final ProjectInviteRepository projectInviteRepository;
-    private final GetProjectMembershipByUserEmailAndProjectId getProjectMembershipByUserEmailAndProjectId;
-
 
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
@@ -54,12 +47,14 @@ public class ProjectInviteService {
 
     private ProjectInviteEntity saveInvitationToDb(InviteRequestDto request) {
 
+        UserEntity user = this.userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
         if (!this.projectInviteRepository
                 .findByEmailAndProjectId(request.email(), request.projectId()).isEmpty()) {
             throw new CannotSendInviteException("Invite already send");
         }
-
-        if (this.getProjectMembershipByUserEmailAndProjectId.findProjectMembershipByUserEmailAndProjectId(request.email(), request.projectId()).isPresent()) {
+        if (this.projectMembershipRepository.findProjectMembershipByUserEmailAndProjectId(request.email(), request.projectId()).isPresent()) {
             throw new CannotSendInviteException("User already in this project");
         }
 
@@ -67,9 +62,6 @@ public class ProjectInviteService {
                 .orElseThrow(() -> new ProjectNotFoundException("Project not found"));
 
         ProjectMembershipEntity sender = this.membershipService.getCurrentProjectMembership();
-
-        UserEntity user = this.userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         ProjectUserRoleEntity userRole = this.projectUserRoleRepository.findProjectUserRoleEntityByRoleName(request.role())
                 .orElseThrow(() -> new RoleNotFoundException("Role not found"));

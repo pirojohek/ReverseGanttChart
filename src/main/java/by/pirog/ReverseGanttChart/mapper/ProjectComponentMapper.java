@@ -61,6 +61,7 @@ public interface ProjectComponentMapper {
     @Mapping(target = "reviewerTaskStatus", source = "reviewerTaskStatus", qualifiedByName = "ToReviewerTaskStatusResponseDtoOrNull")
     @Mapping(target = "taskMakers", source = "taskMakers", qualifiedByName = "TaskMakerSetToList")
     @Mapping(target = "comments", source = "comments", qualifiedByName = "CommentSetToList")
+    @Mapping(target = "globalTaskStatus", source = "globalTaskStatus")
     ProjectComponentResponseDto toProjectComponentResponseDto(ProjectComponentEntity entity);
 
     default List<ProjectComponentResponseDto> toHierarchyDtoList(List<ProjectComponentEntity> entities) {
@@ -107,7 +108,7 @@ public interface ProjectComponentMapper {
     @Mapping(target = "taskMakers", ignore = true)
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "projectComponentChildren", ignore = true)
-    @Mapping(target = "pos", ignore = true)
+    @Mapping(target = "globalTaskStatus", ignore = true)
     ProjectComponentEntity toEntity(
             CreateProjectComponentDto dto,
             ProjectMembershipEntity creator,
@@ -121,8 +122,17 @@ public interface ProjectComponentMapper {
             @MappingTarget ProjectComponentEntity entity
     ) {
         if (dto != null) {
-            entity.setDeadlineFromLocalDateAndTime(dto.deadlineDate(), dto.deadlineTime());
-            entity.setStartDateFromLocalDateAndTime(dto.startDate(), dto.startTime());
+            if (dto.deadlineDate() != null && dto.deadlineTime() != null) {
+                entity.setDeadlineFromLocalDateAndTime(dto.deadlineDate(), dto.deadlineTime());
+            } else {
+                entity.setDeadlineFromLocalDate(dto.deadlineDate());
+            }
+
+            if (dto.startDate() != null && dto.startTime() != null) {
+                entity.setStartDateFromLocalDateAndTime(dto.startDate(), dto.startTime());
+            } else {
+                entity.setStartDateFromLocalDate(dto.startDate());
+            }
         }
     }
 
@@ -142,7 +152,6 @@ public interface ProjectComponentMapper {
     @Mapping(target = "taskMakers", ignore = true)
     @Mapping(target = "comments", ignore = true)
     @Mapping(target = "projectComponentChildren", ignore = true)
-    @Mapping(target = "pos", ignore = true)
     ProjectComponentEntity updateEntityFromDto(
             UpdateProjectComponentRequestDto dto,
             @MappingTarget ProjectComponentEntity entity

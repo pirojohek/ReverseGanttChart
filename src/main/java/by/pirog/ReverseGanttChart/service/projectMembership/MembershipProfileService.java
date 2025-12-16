@@ -45,9 +45,9 @@ public class MembershipProfileService {
 
     private ProjectMembershipEntity getCurrentProjectMembership(){
         var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
-        return this.projectMembershipRepository.findByUserEmailAndProjectId(user.getEmail(), token.getProjectId())
+        return this.projectMembershipRepository.findByUsernameAndProjectId(user.getUsername(), token.getProjectId())
                 .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + user.getEmail() + " not found"));
     }
 }

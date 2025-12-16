@@ -15,7 +15,6 @@ import java.util.List;
 public interface InviteMapper {
 
 
-    @Mapping(target = "id", source = "id")
     @Mapping(target = "inviteStatus", source = "inviteStatus")
     @Mapping(target = "userRole", source = "userRole.roleName")
     @Mapping(target = "invitedPersonEmail", source = "user.email")

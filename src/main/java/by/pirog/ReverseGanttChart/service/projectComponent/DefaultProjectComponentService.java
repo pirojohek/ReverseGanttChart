@@ -9,7 +9,7 @@ import by.pirog.ReverseGanttChart.mapper.ProjectComponentMapper;
 import by.pirog.ReverseGanttChart.security.token.CustomAuthenticationToken;
 import by.pirog.ReverseGanttChart.security.user.CustomUserDetails;
 import by.pirog.ReverseGanttChart.service.project.ProjectEntityService;
-import by.pirog.ReverseGanttChart.service.projectMembership.GetProjectMembershipByUserEmailAndProjectId;
+import by.pirog.ReverseGanttChart.service.projectMembership.GetProjectMembershipByUsernameAndProjectId;
 import by.pirog.ReverseGanttChart.storage.entity.*;
 import by.pirog.ReverseGanttChart.storage.repository.ProjectComponentRepository;
 import jakarta.validation.ValidationException;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.Instant;
 import java.util.*;
@@ -35,7 +34,7 @@ public class DefaultProjectComponentService implements ProjectComponentService {
 
     private final ProjectComponentRepository projectComponentRepository;
 
-    private final GetProjectMembershipByUserEmailAndProjectId getProjectMembershipByUserEmailAndProjectId;
+    private final GetProjectMembershipByUsernameAndProjectId getProjectMembershipByUsernameAndProjectId;
 
 
     private final ProjectComponentMapper projectComponentMapper;
@@ -49,7 +48,7 @@ public class DefaultProjectComponentService implements ProjectComponentService {
         var customUserDetails = (CustomUserDetails) authentication.getDetails();
 
         ProjectMembershipEntity creator =
-                getProjectMembershipByUserEmailAndProjectId.findProjectMembershipByUserEmailAndProjectId(customUserDetails.getEmail(), token.getProjectId())
+                getProjectMembershipByUsernameAndProjectId.findProjectMembershipByUsernameAndProjectId(customUserDetails.getUsername(), token.getProjectId())
                         .orElseThrow(() -> new UserIsNotMemberInProjectException(customUserDetails.getEmail()));
 
         ProjectComponentEntity parent = null;
@@ -62,7 +61,7 @@ public class DefaultProjectComponentService implements ProjectComponentService {
 
         ProjectEntity project = this.projectService.findProjectById(token.getProjectId())
                 .orElseThrow(() -> new ProjectNotFoundException(token.getProjectId().toString()));
-
+        // Он видимо не понимает, что может быть у даты null
         ProjectComponentEntity entity = this.projectComponentMapper.toEntity(dto, creator, project, parent);
 
         if (entity.getStartDate().isAfter(entity.getDeadline())){

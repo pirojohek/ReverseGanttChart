@@ -23,8 +23,9 @@ public class UserController {
         if (authentication instanceof PreAuthenticatedAuthenticationToken) {
             Token yourToken = (Token) authentication.getCredentials();
 
-            return ResponseEntity.ok(Map.of(
+                return ResponseEntity.ok(Map.of(
                     "email", authentication.getName(),
+                    "username", authentication.getName(),
                     "tokenId", yourToken.id(),
                     "authorities", yourToken.authorities(),
                     "expiresAt", yourToken.expiresAt()

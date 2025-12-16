@@ -2,6 +2,7 @@ package by.pirog.ReverseGanttChart.service.studentTaskStatus;
 
 import by.pirog.ReverseGanttChart.dto.studentStatusDto.SetTaskStatusRequestDto;
 import by.pirog.ReverseGanttChart.dto.studentStatusDto.StudentTaskStatusResponseDto;
+import by.pirog.ReverseGanttChart.events.event.StudentTaskStatusChangedEvent;
 import by.pirog.ReverseGanttChart.exception.ProjectComponentNotFoundException;
 import by.pirog.ReverseGanttChart.exception.TaskStatusNotFoundException;
 import by.pirog.ReverseGanttChart.exception.UserIsNotTaskMakerException;
@@ -14,6 +15,7 @@ import by.pirog.ReverseGanttChart.storage.repository.StudentTaskStatusRepository
 import by.pirog.ReverseGanttChart.storage.repository.TaskMakerRepository;
 import by.pirog.ReverseGanttChart.storage.repository.TaskStatusRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -32,10 +34,9 @@ public class DefaultStudentTaskStatusService implements StudentTaskStatusService
     private final MembershipService membershipService;
 
     private final StudentTaskStatusMapper studentTaskStatusMapper;
-    /*
-     тут видимо прикольная логика будет, если чувак поставит статус невыполнено на дочерней задаче
-     то нужно сделать так, чтобы у родительской задачи тоже стал статус невыполнено
-     */
+
+    private final ApplicationEventPublisher applicationEventPublisher;
+
     @Override
     public StudentTaskStatusResponseDto setTaskStatus(SetTaskStatusRequestDto dto) {
         var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -65,7 +66,6 @@ public class DefaultStudentTaskStatusService implements StudentTaskStatusService
             studentTaskStatusEntity.setStatus(taskStatusEntity);
             studentTaskStatusEntity.setStudent(membership);
         } else {
-
             studentTaskStatusEntity = StudentTaskStatusEntity.builder()
                     .student(membership)
                     .task(projectComponent)
@@ -74,6 +74,8 @@ public class DefaultStudentTaskStatusService implements StudentTaskStatusService
         }
 
         studentTaskStatusEntity = studentTaskStatusRepository.save(studentTaskStatusEntity);
+
+        this.applicationEventPublisher.publishEvent(new StudentTaskStatusChangedEvent(studentTaskStatusEntity.getId(), studentTaskStatusEntity.getStatus()));
 
         return this.studentTaskStatusMapper.toStudentTaskStatusDto(studentTaskStatusEntity);
     }

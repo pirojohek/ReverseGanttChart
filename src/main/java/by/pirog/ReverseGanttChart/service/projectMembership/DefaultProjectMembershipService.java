@@ -25,7 +25,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class DefaultProjectMembershipService implements GetProjectMembershipByUserEmailAndProjectId, MembershipService {
+public class DefaultProjectMembershipService implements GetProjectMembershipByUsernameAndProjectId, MembershipService {
 
     private final UserService userService;
     private final ProjectEntityService projectService;
@@ -37,8 +37,8 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
     private final ProjectMembershipMapper projectMembershipMapper;
 
     @Override
-    public Optional<ProjectMembershipEntity> findProjectMembershipByUserEmailAndProjectId(String email, Long projectId) {
-        return projectMembershipRepository.findByUserEmailAndProjectId(email, projectId);
+    public Optional<ProjectMembershipEntity> findProjectMembershipByUsernameAndProjectId(String username, Long projectId) {
+        return projectMembershipRepository.findByUsernameAndProjectId(username, projectId);
     }
 
     @Override
@@ -73,15 +73,15 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
                 .build();
         this.projectMembershipRepository.save(projectMembershipEntity);
     }
-
+    // Todo - когда добавили пользователя по email, уже по факту все операции с ним будут происходить по внутреннему нику
     @Override
-    public void removeMembershipFromProjectByEmail(String email) {
+    public void removeMembershipFromProjectByEmail(String projectUsername) {
         var token =
                 (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-
+        // Todo - здесь должен быть другой метод, который уже ищет по нику внутри проекта
         ProjectMembershipEntity membership =
-                this.projectMembershipRepository.findByUserEmailAndProjectId(email, token.getProjectId())
-                .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + email + " not found"));
+                this.projectMembershipRepository.findProjectMembershipByProjectUsernameAndProjectId(projectUsername, token.getProjectId())
+                .orElseThrow(() -> new UserIsNotMemberInProjectException("User with project username " + projectUsername + " not found"));
 
         this.projectMembershipRepository.delete(membership);
     }
@@ -100,12 +100,12 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
     }
 
     @Override
-    public void updateProjectMembershipAuthority(String email, UserRole userRole) {
+    public void updateProjectMembershipAuthority(String projectUsername, UserRole userRole) {
         var token =
                 (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         ProjectMembershipEntity projectMembership =
-                this.projectMembershipRepository.findByUserEmailAndProjectId(email, token.getProjectId())
-                        .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + email + " not found"));
+                this.projectMembershipRepository.findProjectMembershipByProjectUsernameAndProjectId(projectUsername, token.getProjectId())
+                        .orElseThrow(() -> new UserIsNotMemberInProjectException("User with project username " + projectUsername + " not found"));
 
         ProjectUserRoleEntity role = this.projectUserRoleRepository.findProjectUserRoleEntityByRoleName(userRole.getAuthority())
                 .orElseThrow(() -> new RoleNotFoundException("Role with name " + userRole.getAuthority() + " not found"));
@@ -117,7 +117,7 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
     @Override
     public List<ProjectMembershipUserProjectsResponseDto> getAllUserMemberships() {
 
-        var userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
         List<ProjectMembershipEntity> projectMemberships = this.projectMembershipRepository
                 .findAllByUserEmail(userDetails.getEmail());
@@ -130,18 +130,18 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
     @Override
     public ProjectMembershipEntity getCurrentProjectMembership() {
         var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        var user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var user = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
-        return findProjectMembershipByUserEmailAndProjectId(user.getEmail(), token.getProjectId())
+        return findProjectMembershipByUsernameAndProjectId(user.getUsername(), token.getProjectId())
                 .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + user.getEmail() + " not found"));
     }
 
     @Override
-    public ProjectMembershipEntity getProjectMembershipByEmail(String email) {
+    public ProjectMembershipEntity getProjectMembershipByEmail(String projectUsername) {
         var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        return this.projectMembershipRepository.findByUserEmailAndProjectId(email, token.getProjectId())
-                .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + email + " not found"));
+        return this.projectMembershipRepository.findProjectMembershipByProjectUsernameAndProjectId(projectUsername, token.getProjectId())
+                .orElseThrow(() -> new UserIsNotMemberInProjectException("User with project username " + projectUsername + " not found"));
     }
 
     @Override

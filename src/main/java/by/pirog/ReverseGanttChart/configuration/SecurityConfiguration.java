@@ -145,6 +145,10 @@ public class SecurityConfiguration {
 
                                 .requestMatchers("/api/comment/**").access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.STUDENT.getAuthority()))
 
+                                .requestMatchers("/api/membership/profile").access(authorizationManagerFactory.hasProjectAccess())
+
+                                .requestMatchers("/api/invite/send").access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))
+
                                 .requestMatchers("/api/projectComponent/action/**")
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))
                                 .requestMatchers("/api/projectComponent")

@@ -20,7 +20,7 @@ public class ProjectTokenCookieFactory implements Function<ProjectMembershipEnti
     public Token apply(ProjectMembershipEntity projectMembership) {
         var now = Instant.now();
 
-        return new Token(UUID.randomUUID(), projectMembership.getUser().getEmail(),
+        return new Token(UUID.randomUUID(), projectMembership.getUser().getUsername(),
                 List.of(projectMembership.getUserRole().getRoleName()), projectMembership.getProject().getId(),
                 TokenType.PROJECT, now, now.plus(tokenTtl));
     }

@@ -29,7 +29,7 @@ public class DefaultProjectService implements ProjectService, ProjectEntityServi
     private final ProjectMembershipRepository projectMembershipRepository;
 
     private final ProjectUserRoleRepository projectUserRoleRepository;
-
+    // Здесь нужно сделать проверку времени
     @Override
     public CreatedProjectDto createProject(CreateProjectDto projectDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

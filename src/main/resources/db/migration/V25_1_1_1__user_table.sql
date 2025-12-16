@@ -85,7 +85,7 @@ CREATE TABLE storage.t_project_component
     c_start_date                  TIMESTAMP    NOT NULL,
     c_creator_id                  INTEGER REFERENCES storage.t_project_membership (c_id),
     c_created_at                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    c_summary_status              VARCHAR(128)
+    c_global_status              VARCHAR(128)
 );
 
 

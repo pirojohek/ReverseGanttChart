@@ -23,7 +23,7 @@ public class DefaultUserService implements UserService {
 
     @Override
     public UserEntity getCurrentUser() {
-        var userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
         return this.userRepository.findByEmail(userDetails.getEmail())
             .orElseThrow(() -> new UserNotFoundException("User not found"));

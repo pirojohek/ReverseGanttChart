@@ -3,6 +3,7 @@ package by.pirog.ReverseGanttChart.service.reviewerTaskStatus;
 
 import by.pirog.ReverseGanttChart.dto.reviwerStatusDto.ReviewerTaskStatusResponseDto;
 import by.pirog.ReverseGanttChart.dto.reviwerStatusDto.SetReviewerTaskStatusRequestDto;
+import by.pirog.ReverseGanttChart.events.event.ReviewerTaskStatusChangedEvent;
 import by.pirog.ReverseGanttChart.exception.ProjectComponentNotFoundException;
 import by.pirog.ReverseGanttChart.exception.ReviewerTaskStatusNotFound;
 import by.pirog.ReverseGanttChart.mapper.ReviewerTaskStatusMapper;
@@ -16,6 +17,7 @@ import by.pirog.ReverseGanttChart.storage.repository.ProjectComponentRepository;
 import by.pirog.ReverseGanttChart.storage.repository.ReviewerStatusRepository;
 import by.pirog.ReverseGanttChart.storage.repository.ReviewerTaskStatusRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,10 @@ public class DefaultReviewerTaskStatusService implements ReviewerTaskStatusServi
     private final MembershipService membershipService;
 
     private final ReviewerTaskStatusMapper reviewerTaskStatusMapper;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    // Todo - добавить проверку, что reviewer не может установить статус задачи, если нет статуса студента
 
     @Override
     public ReviewerTaskStatusResponseDto setReviewerTaskStatus(SetReviewerTaskStatusRequestDto dto) {
@@ -64,6 +70,9 @@ public class DefaultReviewerTaskStatusService implements ReviewerTaskStatusServi
         }
 
         reviewerTaskStatusEntity = this.reviewerTaskStatusRepository.save(reviewerTaskStatusEntity);
+
+        applicationEventPublisher.publishEvent(new ReviewerTaskStatusChangedEvent(reviewerTaskStatusEntity.getId(),
+                reviewerTaskStatusEntity.getTaskStatus()));
 
         return this.reviewerTaskStatusMapper.toReviewerTaskStatusResponseDto(reviewerTaskStatusEntity);
     }

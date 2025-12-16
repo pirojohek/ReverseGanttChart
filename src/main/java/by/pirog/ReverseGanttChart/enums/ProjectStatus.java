@@ -1,5 +1,5 @@
 package by.pirog.ReverseGanttChart.enums;
 
 public enum ProjectStatus {
-    // Todo придумать статусы для проекта
+    COMPLETED, IN_PROCESS, OVERDUE // TODO - добавить эти статусы к проекту
 }

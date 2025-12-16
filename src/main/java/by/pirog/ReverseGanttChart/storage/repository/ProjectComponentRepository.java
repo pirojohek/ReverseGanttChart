@@ -57,19 +57,10 @@ public interface ProjectComponentRepository extends JpaRepository<ProjectCompone
     List<ProjectComponentEntity> findAllByProjectIdWithGraph(@Param("projectId") Long projectId);
 
 
-    // Поиск корневых элементов (без родителя) для проекта
     @Query("SELECT pc FROM ProjectComponentEntity pc " +
-            "WHERE pc.project.id = :projectId AND pc.projectComponentParent IS NULL " +
-            "ORDER BY pc.createdAt ASC")
-    List<ProjectComponentEntity> findRootComponentsByProjectId(
-            @Param("projectId") Long projectId
-    );
+            "LEFT JOIN FETCH pc.studentTaskStatus " +
+            "LEFT JOIN FETCH pc.reviewerTaskStatus ")
+    ProjectComponentEntity findProjectComponentEntityById(Long id);
 
-
-    // Найти всех детей для родителя
-    @Query("SELECT pc FROM ProjectComponentEntity pc " +
-            "WHERE pc.projectComponentParent.id = :parentId " +
-            "ORDER BY pc.pos ASC")
-    List<ProjectComponentEntity> findChildrenByParentId(@Param("parentId") Long parentId);
 
 }

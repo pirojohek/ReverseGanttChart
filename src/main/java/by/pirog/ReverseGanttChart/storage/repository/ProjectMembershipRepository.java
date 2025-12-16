@@ -16,11 +16,18 @@ public interface ProjectMembershipRepository extends JpaRepository<ProjectMember
             "JOIN FETCH pm.user " +
             "JOIN FETCH pm.project " +
             "JOIN FETCH pm.userRole " +
-            "WHERE pm.user.email = :email AND pm.project.id = :projectId")
-    Optional<ProjectMembershipEntity> findByUserEmailAndProjectId(@Param("email") String email, @Param("projectId") Long projectId);
+            "WHERE pm.user.username = :username AND pm.project.id = :projectId")
+    Optional<ProjectMembershipEntity> findByUsernameAndProjectId(@Param("username") String username, @Param("projectId") Long projectId);
 
     List<ProjectMembershipEntity> findAllByProjectId(Long projectId);
 
+    @Query("SELECT pm FROM ProjectMembershipEntity pm " +
+            "JOIN FETCH pm.user " +
+            "JOIN FETCH pm.userRole " +
+            "JOIN FETCH pm.project " +
+            "WHERE pm.projectUsername = :projectUsername AND pm.project.id = :projectId")
+    Optional<ProjectMembershipEntity> findProjectMembershipByProjectUsernameAndProjectId
+            (@Param("projectUsername") String projectUsername, @Param("projectId") Long projectId);
 
     @Query("SELECT pm FROM ProjectMembershipEntity pm " +
             "JOIN FETCH pm.user " +
@@ -33,4 +40,12 @@ public interface ProjectMembershipRepository extends JpaRepository<ProjectMember
             "JOIN FETCH pm.project " +
             "WHERE pm.projectUsername = :username and pm.project.id = :projectId")
     Optional<ProjectMembershipEntity> findProjectMembershipByUsernameAndProjectId(@Param("username") String username, @Param("projectId") Long projectId);
+
+
+    @Query("SELECT pm FROM ProjectMembershipEntity pm " +
+            "JOIN FETCH pm.user " +
+            "JOIN FETCH pm.project " +
+            "JOIN FETCH pm.userRole " +
+            "WHERE pm.user.email = :email AND pm.project.id = :projectId")
+    Optional<ProjectMembershipEntity> findProjectMembershipByUserEmailAndProjectId(@Param("email") String email, @Param("projectId") Long projectId);
 }

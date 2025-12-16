@@ -25,6 +25,8 @@ public class ProjectComponentResponseDto {
     private Long parentId;
     private LocalDateTime createdAt;
 
+    private String globalTaskStatus;
+
     private LocalDateTime deadline;
 
     private LocalDateTime startDate;

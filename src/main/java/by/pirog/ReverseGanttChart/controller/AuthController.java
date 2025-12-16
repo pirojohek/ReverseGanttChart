@@ -20,6 +20,7 @@ public class AuthController {
 
     private final RegisterService registerService;
 
+    // Todo - обработать ошибку с форматом email, она есть, но неправильно обрабатывается
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegistrationDto registrationDto,
                                       BindingResult bindingResult) throws BindException {

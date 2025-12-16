@@ -1,6 +1,7 @@
 package by.pirog.ReverseGanttChart.storage.entity;
 
 
+import by.pirog.ReverseGanttChart.enums.GlobalTaskStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -44,8 +45,8 @@ public class ProjectComponentEntity {
     @Column(name = "c_created_at")
     private Instant createdAt;
 
-    @Column(name = "c_summary_status")
-    private
+    @Column(name = "c_global_status")
+    private GlobalTaskStatus globalTaskStatus;
 
     @Column(name = "c_deadline")
     private Instant deadline;
@@ -72,20 +73,47 @@ public class ProjectComponentEntity {
     private Set<CommentEntity> comments = new HashSet<>();
 
     // Методы для работы с датами и добавления taskMaker
-    public void setDeadlineFromLocalDateAndTime(LocalDate date, LocalTime time){
-        this.deadline = Instant.from(LocalDateTime.of(date, time));
+    private static final ZoneId UTC_ZONE = ZoneId.of("UTC");
+
+    // Методы для установки дат с использованием UTC
+    public void setDeadlineFromLocalDateAndTime(LocalDate date, LocalTime time) {
+        if (date == null || time == null) {
+            this.deadline = null;
+            return;
+        }
+        this.deadline = LocalDateTime.of(date, time)
+                .atZone(UTC_ZONE)
+                .toInstant();
     }
 
-    public void setDeadlineFromLocalDate(LocalDate localDate){
-        this.deadline = Instant.from(LocalDateTime.of(localDate, LocalTime.MIN));
+    public void setDeadlineFromLocalDate(LocalDate localDate) {
+        if (localDate == null) {
+            this.deadline = null;
+            return;
+        }
+        this.deadline = LocalDateTime.of(localDate, LocalTime.MIN)
+                .atZone(UTC_ZONE)
+                .toInstant();
     }
 
-    public void setStartDateFromLocalDate(LocalDate date){
-        this.startDate = Instant.from(LocalDateTime.of(date, LocalTime.MIN));
+    public void setStartDateFromLocalDate(LocalDate date) {
+        if (date == null) {
+            this.startDate = null;
+            return;
+        }
+        this.startDate = LocalDateTime.of(date, LocalTime.MIN)
+                .atZone(UTC_ZONE)
+                .toInstant();
     }
 
-    public void setStartDateFromLocalDateAndTime(LocalDate date, LocalTime time){
-        this.startDate = Instant.from(LocalDateTime.of(date, time));
+    public void setStartDateFromLocalDateAndTime(LocalDate date, LocalTime time) {
+        if (date == null || time == null) {
+            this.startDate = null;
+            return;
+        }
+        this.startDate = LocalDateTime.of(date, time)
+                .atZone(UTC_ZONE)
+                .toInstant();
     }
 
     public LocalDateTime getCreatedAtAsLocalDateTime() {
@@ -94,15 +122,39 @@ public class ProjectComponentEntity {
                 : null;
     }
 
-    public LocalDateTime getStartDateAsLocalDateTime(){
+    public LocalDateTime getStartDateAsLocalDateTime() {
         return startDate != null
                 ? LocalDateTime.ofInstant(startDate, ZoneId.systemDefault())
                 : null;
     }
 
-    public LocalDateTime getDeadlineAsLocalDateTime(){
+    public LocalDateTime getDeadlineAsLocalDateTime() {
         return deadline != null
                 ? LocalDateTime.ofInstant(deadline, ZoneId.systemDefault())
+                : null;
+    }
+
+    public LocalDate getStartDateAsLocalDate() {
+        return startDate != null
+                ? startDate.atZone(UTC_ZONE).toLocalDate()
+                : null;
+    }
+
+    public LocalDate getDeadlineAsLocalDate() {
+        return deadline != null
+                ? deadline.atZone(UTC_ZONE).toLocalDate()
+                : null;
+    }
+
+    public LocalTime getStartDateAsLocalTime() {
+        return startDate != null
+                ? startDate.atZone(UTC_ZONE).toLocalTime()
+                : null;
+    }
+
+    public LocalTime getDeadlineAsLocalTime() {
+        return deadline != null
+                ? deadline.atZone(UTC_ZONE).toLocalTime()
                 : null;
     }
 

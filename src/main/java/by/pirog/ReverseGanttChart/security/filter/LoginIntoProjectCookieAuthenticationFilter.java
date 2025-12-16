@@ -3,7 +3,7 @@ package by.pirog.ReverseGanttChart.security.filter;
 import by.pirog.ReverseGanttChart.exception.UserIsNotMemberInProjectException;
 import by.pirog.ReverseGanttChart.security.securityService.tokenService.ResponseCookieProjectToken;
 import by.pirog.ReverseGanttChart.security.token.Token;
-import by.pirog.ReverseGanttChart.service.projectMembership.GetProjectMembershipByUserEmailAndProjectId;
+import by.pirog.ReverseGanttChart.service.projectMembership.GetProjectMembershipByUsernameAndProjectId;
 import by.pirog.ReverseGanttChart.storage.entity.ProjectMembershipEntity;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,13 +25,13 @@ public class LoginIntoProjectCookieAuthenticationFilter extends OncePerRequestFi
     private final RequestMatcher requestMatcher =
             new AntPathRequestMatcher("/api/loginIntoProject/*", HttpMethod.POST.name());
 
-    private final GetProjectMembershipByUserEmailAndProjectId getProjectMembershipByUserEmailAndProjectId;
+    private final GetProjectMembershipByUsernameAndProjectId getProjectMembershipByUsernameAndProjectId;
     private final ResponseCookieProjectToken responseCookieProjectToken;
 
     public LoginIntoProjectCookieAuthenticationFilter(
-            GetProjectMembershipByUserEmailAndProjectId getProjectMembershipByUserEmailAndProjectId,
+            GetProjectMembershipByUsernameAndProjectId getProjectMembershipByUsernameAndProjectId,
             ResponseCookieProjectToken responseCookieProjectToken) {
-        this.getProjectMembershipByUserEmailAndProjectId = getProjectMembershipByUserEmailAndProjectId;
+        this.getProjectMembershipByUsernameAndProjectId = getProjectMembershipByUsernameAndProjectId;
         this.responseCookieProjectToken = responseCookieProjectToken;
     }
 
@@ -55,8 +55,8 @@ public class LoginIntoProjectCookieAuthenticationFilter extends OncePerRequestFi
 
             Token token = (Token) authentication.getCredentials();
 
-            ProjectMembershipEntity projectMembershipEntity = getProjectMembershipByUserEmailAndProjectId
-                    .findProjectMembershipByUserEmailAndProjectId(token.subject(), projectId)
+            ProjectMembershipEntity projectMembershipEntity = getProjectMembershipByUsernameAndProjectId
+                    .findProjectMembershipByUsernameAndProjectId(token.subject(), projectId)
                     .orElseThrow(() -> new UserIsNotMemberInProjectException("User is not member of project"));
 
             var cookie = responseCookieProjectToken.createProjectTokenCookie(projectMembershipEntity);

@@ -21,7 +21,7 @@ public interface StudentTaskStatusMapper {
 
     @Named("ToStudentTaskStatusDtoOrNull")
     default StudentTaskStatusResponseDto toStudentTaskStatusDto(StudentTaskStatusEntity entity) {
-        return entity != null ? toStudentTaskStatusDto(entity) : null;
+        return entity != null ? toDto(entity) : null;
     }
 
 

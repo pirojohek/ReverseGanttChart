@@ -25,7 +25,6 @@ public class TaskMakersController {
         return ResponseEntity.ok(response);
     }
 
-    // Todo- нужно добавить обработку ошибок, что пользователь не может взять задачу повторно если он там есть
 
     @PostMapping("/setMaker")
     public ResponseEntity<List<TakenTaskResponseDto>> giveMembershipTasksToMake(@RequestParam("email") String email,

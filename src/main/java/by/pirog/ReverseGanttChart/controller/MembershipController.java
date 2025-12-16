@@ -43,16 +43,16 @@ public class MembershipController {
 
     @DeleteMapping("/action/remove")
     public ResponseEntity<Void> removeProjectMembership(
-                                                        @RequestParam("email") String email) {
-        this.membershipService.removeMembershipFromProjectByEmail(email);
+                                                        @RequestParam("projectUsername") String projectUsername) {
+        this.membershipService.removeMembershipFromProjectByEmail(projectUsername);
 
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/action/updateAuthority")
-    public ResponseEntity<Void> updateProjectMembershipAuthority(@RequestParam("email") String email,
+    public ResponseEntity<Void> updateProjectMembershipAuthority(@RequestParam("projectUsername") String projectUsername,
                                                                  @RequestParam("role") UserRole role) {
-        this.membershipService.updateProjectMembershipAuthority(email, role);
+        this.membershipService.updateProjectMembershipAuthority(projectUsername, role);
 
         return ResponseEntity.ok().build();
     }
