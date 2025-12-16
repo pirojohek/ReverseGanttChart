@@ -44,8 +44,8 @@ public class ProjectComponentEntity {
     @Column(name = "c_created_at")
     private Instant createdAt;
 
-    @Column(name = "c_pos")
-    private Long pos;
+    @Column(name = "c_summary_status")
+    private
 
     @Column(name = "c_deadline")
     private Instant deadline;

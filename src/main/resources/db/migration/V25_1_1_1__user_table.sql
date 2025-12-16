@@ -5,7 +5,7 @@ CREATE SCHEMA IF NOT EXISTS storage;
 CREATE TABLE storage.t_user
 (
     c_id       SERIAL PRIMARY KEY,
-    c_username VARCHAR(512) NOT NULL UNIQUE,
+    c_username VARCHAR(512)  NOT NULL UNIQUE,
     c_email    VARCHAR(512)  NOT NULL UNIQUE,
     c_password VARCHAR(1024) NOT null
 );
@@ -32,11 +32,11 @@ CREATE TABLE storage.t_project_user_role
 -- Создание таблицы связи пользователей с проектами и ролями
 CREATE TABLE storage.t_project_membership
 (
-    c_id        SERIAL PRIMARY KEY,
-    c_user_role INTEGER NOT NULL REFERENCES storage.t_project_user_role (c_id),
-    c_user      INTEGER NOT NULL REFERENCES storage.t_user (c_id),
+    c_id               SERIAL PRIMARY KEY,
+    c_user_role        INTEGER NOT NULL REFERENCES storage.t_project_user_role (c_id),
+    c_user             INTEGER NOT NULL REFERENCES storage.t_user (c_id),
     c_project_username VARCHAR(512),
-    c_project   INTEGER NOT NULL REFERENCES storage.t_project (c_id),
+    c_project          INTEGER NOT NULL REFERENCES storage.t_project (c_id),
     UNIQUE (c_user, c_project) -- Один пользователь может иметь только одну роль в проекте
 );
 
@@ -85,7 +85,7 @@ CREATE TABLE storage.t_project_component
     c_start_date                  TIMESTAMP    NOT NULL,
     c_creator_id                  INTEGER REFERENCES storage.t_project_membership (c_id),
     c_created_at                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    c_pos                         INTEGER
+    c_summary_status              VARCHAR(128)
 );
 
 
@@ -121,19 +121,22 @@ CREATE TABLE storage.t_task_maker
 CREATE TABLE storage.t_comment
 (
     c_id                   SERIAL PRIMARY KEY,
-    c_comment              TEXT    NOT NULL,
-    c_commenter            INTEGER NOT NULL REFERENCES storage.t_project_membership (c_id),
-    c_project_component_id INTEGER NOT NULL REFERENCES storage.t_project_component (c_id),
+    c_comment              TEXT      NOT NULL,
+    c_commenter            INTEGER   NOT NULL REFERENCES storage.t_project_membership (c_id),
+    c_project_component_id INTEGER   NOT NULL REFERENCES storage.t_project_component (c_id),
     c_created_at           TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    c_updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    c_updated_at           TIMESTAMP          DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE storage.t_project_invite(
-    c_id SERIAL PRIMARY KEY,
-    c_project_id INTEGER NOT NULL REFERENCES storage.t_project (c_id),
-    c_user_id INTEGER NOT NULL REFERENCES storage.t_user (c_id),
-    c_token VARCHAR(256) NOT NULL,
-    c_user_role INTEGER NOT NULL REFERENCES storage.t_project_user_role (c_id),
-    c_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    c_inviter INTEGER NOT NULL REFERENCES storage.t_project_membership (c_id)
+CREATE TABLE storage.t_project_invite
+(
+    c_id            SERIAL PRIMARY KEY,
+    c_project_id    INTEGER      NOT NULL REFERENCES storage.t_project (c_id),
+    c_user_id       INTEGER      NOT NULL REFERENCES storage.t_user (c_id),
+    c_token         VARCHAR(256) NOT NULL,
+    c_user_role     INTEGER      NOT NULL REFERENCES storage.t_project_user_role (c_id),
+    c_created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    c_expired_at    TIMESTAMP,
+    c_inviter       INTEGER      NOT NULL REFERENCES storage.t_project_membership (c_id),
+    c_invite_status VARCHAR(128) NOT NULL
 );

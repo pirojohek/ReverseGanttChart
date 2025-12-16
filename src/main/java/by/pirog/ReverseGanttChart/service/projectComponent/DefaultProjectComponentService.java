@@ -12,15 +12,23 @@ import by.pirog.ReverseGanttChart.service.project.ProjectEntityService;
 import by.pirog.ReverseGanttChart.service.projectMembership.GetProjectMembershipByUserEmailAndProjectId;
 import by.pirog.ReverseGanttChart.storage.entity.*;
 import by.pirog.ReverseGanttChart.storage.repository.ProjectComponentRepository;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+/*
+ Todo - что касается логики изменения статуса задачи, по идее если предыдущие этапы не выполнены
+ Todo - то невозможно будет поставить статус выполнено у родительской задачи
+ Todo - надо еще короче сделать статус, что задача просрочена или пора начинать работать, короче это временной статус или можно сказать итоговый
+ */
 public class DefaultProjectComponentService implements ProjectComponentService {
 
     private final ProjectEntityService projectService;
@@ -56,6 +64,13 @@ public class DefaultProjectComponentService implements ProjectComponentService {
                 .orElseThrow(() -> new ProjectNotFoundException(token.getProjectId().toString()));
 
         ProjectComponentEntity entity = this.projectComponentMapper.toEntity(dto, creator, project, parent);
+
+        if (entity.getStartDate().isAfter(entity.getDeadline())){
+            throw new ValidationException("start date is after deadline");
+        }
+        if (entity.getStartDate().isBefore(Instant.now())){
+            throw new ValidationException("start date is before now");
+        }
 
         entity = this.projectComponentRepository.save(entity);
 

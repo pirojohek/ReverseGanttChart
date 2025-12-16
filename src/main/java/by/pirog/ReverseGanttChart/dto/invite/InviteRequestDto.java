@@ -17,6 +17,6 @@ public record InviteRequestDto(
     Long projectId,
 
     @NotNull(message = "Role is Required")
-     String role){
+    String role){
     
 }

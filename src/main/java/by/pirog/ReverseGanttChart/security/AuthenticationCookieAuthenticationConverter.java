@@ -34,7 +34,7 @@ public class AuthenticationCookieAuthenticationConverter implements Authenticati
     public Authentication convert(HttpServletRequest request) {
         boolean isAuthenticationTokenInBlacklist = checkAuthenticationTokenInBlacklist(request);
         Authentication authenticationAuth = extractAuthenticationTokenToAuth(request);
-
+    // Todo - сделать проверку, естек токен или нет
 
         if (authenticationAuth != null && !isAuthenticationTokenInBlacklist) {
             return new PreAuthenticatedAuthenticationToken

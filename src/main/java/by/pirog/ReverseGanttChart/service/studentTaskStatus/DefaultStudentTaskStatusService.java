@@ -32,7 +32,10 @@ public class DefaultStudentTaskStatusService implements StudentTaskStatusService
     private final MembershipService membershipService;
 
     private final StudentTaskStatusMapper studentTaskStatusMapper;
-
+    /*
+     тут видимо прикольная логика будет, если чувак поставит статус невыполнено на дочерней задаче
+     то нужно сделать так, чтобы у родительской задачи тоже стал статус невыполнено
+     */
     @Override
     public StudentTaskStatusResponseDto setTaskStatus(SetTaskStatusRequestDto dto) {
         var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();

@@ -1,7 +1,12 @@
 package by.pirog.ReverseGanttChart.service.invite;
 
+import by.pirog.ReverseGanttChart.dto.invite.ChangeInviteRoleDto;
 import by.pirog.ReverseGanttChart.dto.invite.InviteRequestDto;
+import by.pirog.ReverseGanttChart.dto.invite.InviteResponseDto;
+import by.pirog.ReverseGanttChart.enums.InviteStatus;
 import by.pirog.ReverseGanttChart.exception.*;
+import by.pirog.ReverseGanttChart.mapper.InviteMapper;
+import by.pirog.ReverseGanttChart.security.token.CustomAuthenticationToken;
 import by.pirog.ReverseGanttChart.service.email.EmailService;
 import by.pirog.ReverseGanttChart.service.projectMembership.DefaultProjectMembershipService;
 import by.pirog.ReverseGanttChart.service.projectMembership.GetProjectMembershipByUserEmailAndProjectId;
@@ -12,9 +17,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -35,18 +45,22 @@ public class ProjectInviteService {
     private final EmailService emailService;
     private final MembershipService membershipService;
 
+    private final InviteMapper inviteMapper;
+
     @Value("${app.frontend-url}")
     private String frontendUrl;
+
+    private Duration tokenTtl = Duration.ofDays(1);
 
     private ProjectInviteEntity saveInvitationToDb(InviteRequestDto request) {
 
         if (!this.projectInviteRepository
                 .findByEmailAndProjectId(request.email(), request.projectId()).isEmpty()) {
-            throw new IllegalArgumentException("Invite already send");
+            throw new CannotSendInviteException("Invite already send");
         }
 
         if (this.getProjectMembershipByUserEmailAndProjectId.findProjectMembershipByUserEmailAndProjectId(request.email(), request.projectId()).isPresent()) {
-            throw new IllegalArgumentException("User already in this project");
+            throw new CannotSendInviteException("User already in this project");
         }
 
         ProjectEntity project = projectRepository.findById(request.projectId())
@@ -58,15 +72,19 @@ public class ProjectInviteService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         ProjectUserRoleEntity userRole = this.projectUserRoleRepository.findProjectUserRoleEntityByRoleName(request.role())
-                .orElseThrow(() -> new RoleNotFoundException("Роль не найдена"));
+                .orElseThrow(() -> new RoleNotFoundException("Role not found"));
 
         String token = UUID.randomUUID().toString();
-
+        Instant now = Instant.now();
+        // Todo - это тоже можно вынести в mapper, чтобы место не занимало
         ProjectInviteEntity projectInvite = ProjectInviteEntity.builder()
                 .project(project)
                 .user(user)
                 .userRole(userRole)
                 .inviter(sender)
+                .inviteStatus(InviteStatus.SUBMITTED)
+                .createdAt(now)
+                .expiredAt(now.plus(tokenTtl))
                 .token(token)
                 .build();
 
@@ -86,22 +104,92 @@ public class ProjectInviteService {
         );
     }
 
+    // Todo - видимо нужно добавить еще кнопку отказа, вообще хотелось бы наверное сделать систему уведомлений
+
+    public List<InviteResponseDto> getAllInvitesInProject(){
+        var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+        List<ProjectInviteEntity> projectInviteEntities =
+                this.projectInviteRepository.findAllByProjectId(token.getProjectId());
+
+        return this.inviteMapper.listEntitiesToListResponseDto(projectInviteEntities);
+    }
+
+    public InviteResponseDto resendInvite(String email) {
+        var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+        ProjectInviteEntity invite = this.projectInviteRepository.findByEmailAndProjectId(email, token.getProjectId())
+                .orElseThrow(() -> new InviteNotFoundException("Invite not found"));
+
+        Instant now = Instant.now();
+        invite.setCreatedAt(now);
+        invite.setExpiredAt(now.plus(tokenTtl));
+        invite.setToken(UUID.randomUUID().toString());
+        invite.setInviteStatus(InviteStatus.SUBMITTED);
+        invite.setInviter(this.membershipService.getCurrentProjectMembership());
+
+        this.projectInviteRepository.save(invite);
+
+        String invitationUrl = frontendUrl + "/accept-invite?token=" + invite.getToken();
+
+        emailService.sendInvitationEmail(
+                email,
+                invite.getProject().getProjectName(),
+                invitationUrl,
+                invite.getInviter().getUser().getEmail()
+        );
+
+        return inviteMapper.projectInviteEntityToDto(invite);
+    }
+
+    public InviteResponseDto changeInviteRole(ChangeInviteRoleDto dto) {
+        var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+        ProjectInviteEntity invite = this.projectInviteRepository.findByEmailAndProjectId(dto.getEmail(), token.getProjectId())
+                .orElseThrow(() -> new InviteNotFoundException("Invite not found"));
+
+        ProjectUserRoleEntity userRole = this.projectUserRoleRepository.findProjectUserRoleEntityByRoleName(dto.getRole())
+                .orElseThrow(() -> new RoleNotFoundException("Role not found"));
+
+        Instant now = Instant.now();
+        invite.setCreatedAt(now);
+        invite.setExpiredAt(now.plus(tokenTtl));
+        invite.setInviteStatus(InviteStatus.SUBMITTED);
+        invite.setInviter(this.membershipService.getCurrentProjectMembership());
+        this.projectInviteRepository.save(invite);
+
+        return inviteMapper.projectInviteEntityToDto(invite);
+    }
+
+    public void deleteInvite(String email) {
+        var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+
+        ProjectInviteEntity invite = this.projectInviteRepository.findByEmailAndProjectId(email, token.getProjectId())
+                .orElseThrow(() -> new InviteNotFoundException("Invite not found"));
+
+        this.projectInviteRepository.delete(invite);
+    }
 
     public void acceptInvitation(String token, String username) {
         ProjectInviteEntity invite = this.projectInviteRepository.findProjectInviteEntityByToken(token)
-                .orElseThrow(() -> new InviteTokenException("Token not found or expired"));
+                .orElseThrow(() -> new InviteTokenException("Token is expired"));
 
         if (this.projectMembershipRepository
                 .findProjectMembershipByUsernameAndProjectId(username, invite.getProject().getId()).isPresent()) {
             throw new IllegalArgumentException("User with username " + username + " already exists");
         }
 
-        // Todo - добавить проверку истек токен или нет
-        // Todo - еще проверка на статус нужна и тд.
+        if (invite.getExpiredAt().isBefore(Instant.now())) {
+            invite.setInviteStatus(InviteStatus.EXPIRED);
+            this.projectInviteRepository.save(invite);
+            throw new InviteTokenException("Token is expired");
+        }
+
         ProjectMembershipEntity projectMembership = ProjectMembershipEntity.builder()
                 .project(invite.getProject())
                 .user(invite.getUser())
                 .userRole(invite.getUserRole())
+                .projectUsername(username)
                 .build();
         this.membershipService.saveProjectMembership(projectMembership);
     }

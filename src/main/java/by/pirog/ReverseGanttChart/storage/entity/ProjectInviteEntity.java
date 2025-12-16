@@ -1,8 +1,10 @@
 package by.pirog.ReverseGanttChart.storage.entity;
 
+import by.pirog.ReverseGanttChart.enums.InviteStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -40,6 +42,12 @@ public class ProjectInviteEntity {
     private UserEntity user;
 
     @Column(name = "c_created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
+    @Column(name = "c_expired_at")
+    private Instant expiredAt;
+
+    @Column(name = "c_invite_status")
+    @Enumerated(EnumType.STRING)
+    private InviteStatus inviteStatus;
 }
