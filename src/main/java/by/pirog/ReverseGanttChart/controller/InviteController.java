@@ -1,5 +1,6 @@
 package by.pirog.ReverseGanttChart.controller;
 
+import by.pirog.ReverseGanttChart.dto.invite.ChangeInviteRoleDto;
 import by.pirog.ReverseGanttChart.dto.invite.InviteRequestDto;
 import by.pirog.ReverseGanttChart.dto.invite.InviteResponseDto;
 import by.pirog.ReverseGanttChart.service.email.EmailService;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,15 +24,35 @@ public class InviteController {
     public ResponseEntity<InviteResponseDto> sendInvite(
             @Valid @RequestBody InviteRequestDto inviteRequestDto
     ) {
-        projectInviteService.sendInvitation(inviteRequestDto);
+        InviteResponseDto response = projectInviteService.sendInvitation(inviteRequestDto);
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/accept")
-    public ResponseEntity<Void> acceptInvite(@RequestParam("token") String token,
-                                             @RequestParam("username") String username){
-        this.projectInviteService.acceptInvitation(token, username);
+    public ResponseEntity<Void> acceptInvite(@RequestParam("token") String token){
+        this.projectInviteService.acceptInvitation(token);
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/action/all")
+    public ResponseEntity<List<InviteResponseDto>> getAllInvites(@RequestParam("token") String token){
+        return ResponseEntity.ok(this.projectInviteService.getAllInvitesInProject());
+    }
+
+    @PostMapping("/action/resend")
+    public ResponseEntity<InviteResponseDto> resendInvite(@RequestParam("email") String email){
+        return ResponseEntity.ok(this.projectInviteService.resendInvite(email));
+    }
+
+    @PatchMapping("/action/changeRole")
+    public ResponseEntity<InviteResponseDto> changeInviteRole(@RequestBody ChangeInviteRoleDto dto){
+        return ResponseEntity.ok(this.projectInviteService.changeInviteRole(dto));
+    }
+
+    @DeleteMapping("/action/delete")
+    public ResponseEntity<InviteResponseDto> deleteInvite(@RequestParam("email") String email){
+        this.projectInviteService.deleteInvite(email);
+        return ResponseEntity.noContent().build();
     }
 }

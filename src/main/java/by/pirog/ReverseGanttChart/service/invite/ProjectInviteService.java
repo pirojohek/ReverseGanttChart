@@ -83,7 +83,7 @@ public class ProjectInviteService {
         return projectInviteRepository.save(projectInvite);
     }
 
-    public void sendInvitation(InviteRequestDto request) {
+    public InviteResponseDto sendInvitation(InviteRequestDto request) {
         ProjectInviteEntity projectInvite = saveInvitationToDb(request);
 
         String invitationUrl = frontendUrl + "/accept-invite?token=" + projectInvite.getToken();
@@ -94,6 +94,8 @@ public class ProjectInviteService {
                 invitationUrl,
                 projectInvite.getInviter().getUser().getEmail() // Todo - потом это все заменить на имя пользователя в системе
         );
+
+        return this.inviteMapper.projectInviteEntityToDto(projectInvite);
     }
 
     // Todo - видимо нужно добавить еще кнопку отказа, вообще хотелось бы наверное сделать систему уведомлений
@@ -162,13 +164,13 @@ public class ProjectInviteService {
         this.projectInviteRepository.delete(invite);
     }
 
-    public void acceptInvitation(String token, String username) {
+    public void acceptInvitation(String token) {
         ProjectInviteEntity invite = this.projectInviteRepository.findProjectInviteEntityByToken(token)
                 .orElseThrow(() -> new InviteTokenException("Token is expired"));
 
         if (this.projectMembershipRepository
-                .findProjectMembershipByUsernameAndProjectId(username, invite.getProject().getId()).isPresent()) {
-            throw new IllegalArgumentException("User with username " + username + " already exists");
+                .findProjectMembershipByUsernameAndProjectId(invite.getUser().getUsername(), invite.getProject().getId()).isPresent()) {
+            throw new IllegalArgumentException("User with username " + invite.getUser().getUsername() + " already exists");
         }
 
         if (invite.getExpiredAt().isBefore(Instant.now())) {
@@ -181,7 +183,7 @@ public class ProjectInviteService {
                 .project(invite.getProject())
                 .user(invite.getUser())
                 .userRole(invite.getUserRole())
-                .projectUsername(username)
+                .projectUsername(invite.getUser().getUsername())
                 .build();
         this.membershipService.saveProjectMembership(projectMembership);
     }

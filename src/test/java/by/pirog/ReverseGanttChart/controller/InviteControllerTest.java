@@ -84,9 +84,8 @@ public class InviteControllerTest {
         String username = "test_user";
 
         mockMvc.perform(post(ACCEPT_URL)
-                .param("token", token)
-        .param("username", username)).andExpect(status().isOk());
+                .param("token", token)).andExpect(status().isOk());
 
-        verify(projectInviteService, times(1)).acceptInvitation(token, username);
+        verify(projectInviteService, times(1)).acceptInvitation(token);
     }
 }

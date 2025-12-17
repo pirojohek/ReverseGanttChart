@@ -59,9 +59,9 @@ logging:
 
 
 app:
-  frontend-url: http://localhost:8080
+  frontend-url: http://localhost:5173
   email:
-    from: pirojochek01@gmail.com
+    from:
 
   security:
     token:
