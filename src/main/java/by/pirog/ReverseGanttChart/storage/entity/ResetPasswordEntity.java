@@ -11,7 +11,7 @@ import java.time.Instant;
 @Getter
 @Builder
 @Entity
-@Table(name = "t_reset_password", catalog = "storage")
+@Table(name = "t_reset_password", schema = "storage")
 public class ResetPasswordEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
