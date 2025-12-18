@@ -33,6 +33,9 @@ public class UserPasswordService {
     @Value("${app.reset-password-ttl}")
     private Duration resetPasswordTtl;
 
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
+
     public void sendResetPassword(String username){
          try{
              Optional<UserEntity> userEntityByUsername = userRepository.findByUsername(username);
@@ -58,7 +61,9 @@ public class UserPasswordService {
 
              resetPasswordRepository.save(entity);
 
-             emailService.sendResetPasswordEmail(username, hashToken);
+             String resetUrl = frontendUrl + "/reset-password?token=" + token;
+
+             emailService.sendResetPasswordEmail(username, resetUrl);
 
          }catch (Exception e){
             // Todo сюда добавить логи

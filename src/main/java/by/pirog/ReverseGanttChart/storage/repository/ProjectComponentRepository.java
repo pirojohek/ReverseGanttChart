@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +16,8 @@ public interface ProjectComponentRepository extends JpaRepository<ProjectCompone
             "LEFT JOIN FETCH pc.projectComponentParent " +
             "LEFT JOIN FETCH pc.projectComponentChildren children " +
             "JOIN FETCH pc.project " +
-            "LEFT JOIN pc.taskMakers " +
-            "LEFT JOIN children.taskMakers " +
+            "LEFT JOIN FETCH pc.taskMakers " +
+            "LEFT JOIN FETCH children.taskMakers " +
             "WHERE pc.id = :componentId AND " +
             "pc.project.id = :projectId")
     Optional<ProjectComponentEntity> findProjectComponentEntityByProjectIdAndComponentIdWithTaskMakers
