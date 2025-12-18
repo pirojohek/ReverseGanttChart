@@ -63,7 +63,7 @@ public class UserPasswordService {
 
              String resetUrl = frontendUrl + "/reset-password?token=" + token;
 
-             emailService.sendResetPasswordEmail(username, resetUrl);
+             emailService.sendResetPasswordEmail(userEntity.getEmail(), resetUrl);
 
          }catch (Exception e){
             // Todo сюда добавить логи
