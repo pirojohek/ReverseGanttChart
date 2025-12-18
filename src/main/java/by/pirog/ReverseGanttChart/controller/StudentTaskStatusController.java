@@ -5,6 +5,7 @@ import by.pirog.ReverseGanttChart.dto.studentStatusDto.SetTaskStatusRequestDto;
 import by.pirog.ReverseGanttChart.dto.studentStatusDto.StudentTaskStatusResponseDto;
 import by.pirog.ReverseGanttChart.service.studentTaskStatus.StudentTaskStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ public class StudentTaskStatusController {
     @PostMapping("/setTaskStatus")
     public ResponseEntity<StudentTaskStatusResponseDto> setTaskStatus(@RequestBody SetTaskStatusRequestDto dto) {
         StudentTaskStatusResponseDto response = this.taskStatusService.setTaskStatus(dto);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
 }

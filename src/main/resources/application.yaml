@@ -61,7 +61,9 @@ logging:
 app:
   frontend-url: http://localhost:5173
   email:
-    from:
+    from: pirojochek01@gmail.com
+
+  reset-password-ttl: 1h
 
   security:
     token:
@@ -69,3 +71,4 @@ app:
       blacklist-token-auth-prefix: "blacklist:auth:"
     cookie:
       auth-cookie-name: "auth-token"
+    algorithm: "SHA-256"

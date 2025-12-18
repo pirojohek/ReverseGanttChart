@@ -9,6 +9,7 @@ import by.pirog.ReverseGanttChart.mapper.InviteMapper;
 import by.pirog.ReverseGanttChart.security.token.CustomAuthenticationToken;
 import by.pirog.ReverseGanttChart.service.email.EmailService;
 import by.pirog.ReverseGanttChart.service.projectMembership.MembershipService;
+import by.pirog.ReverseGanttChart.service.secret.TokenHashService;
 import by.pirog.ReverseGanttChart.storage.entity.*;
 import by.pirog.ReverseGanttChart.storage.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -45,13 +47,13 @@ public class ProjectInviteService {
 
     private Duration tokenTtl = Duration.ofDays(1);
 
-    private ProjectInviteEntity saveInvitationToDb(InviteRequestDto request) {
+    private ProjectInviteEntity saveInvitationToDb(InviteRequestDto request, String hashToken) {
 
         UserEntity user = this.userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.email()));
 
-        if (!this.projectInviteRepository
-                .findByEmailAndProjectId(request.email(), request.projectId()).isEmpty()) {
+        if (this.projectInviteRepository
+                .findByEmailAndProjectId(request.email(), request.projectId()).isPresent()) {
             throw new CannotSendInviteException("Invite already send");
         }
         if (this.projectMembershipRepository.findProjectMembershipByUserEmailAndProjectId(request.email(), request.projectId()).isPresent()) {
@@ -66,7 +68,6 @@ public class ProjectInviteService {
         ProjectUserRoleEntity userRole = this.projectUserRoleRepository.findProjectUserRoleEntityByRoleName(request.role())
                 .orElseThrow(() -> new RoleNotFoundException("Role not found"));
 
-        String token = UUID.randomUUID().toString();
         Instant now = Instant.now();
         // Todo - это тоже можно вынести в mapper, чтобы место не занимало
         ProjectInviteEntity projectInvite = ProjectInviteEntity.builder()
@@ -77,16 +78,20 @@ public class ProjectInviteService {
                 .inviteStatus(InviteStatus.SUBMITTED)
                 .createdAt(now)
                 .expiredAt(now.plus(tokenTtl))
-                .token(token)
+                .token(hashToken)
                 .build();
 
         return projectInviteRepository.save(projectInvite);
     }
 
     public InviteResponseDto sendInvitation(InviteRequestDto request) {
-        ProjectInviteEntity projectInvite = saveInvitationToDb(request);
 
-        String invitationUrl = frontendUrl + "/accept-invite?token=" + projectInvite.getToken();
+        String tokenBase64 = TokenHashService.generateToken(32);
+        String hashToken = TokenHashService.hashToken(tokenBase64);
+
+        ProjectInviteEntity projectInvite = saveInvitationToDb(request, hashToken);
+
+        String invitationUrl = frontendUrl + "/accept-invite?token=" + tokenBase64;
 
         emailService.sendInvitationEmail(
                 request.email(),
@@ -112,19 +117,22 @@ public class ProjectInviteService {
     public InviteResponseDto resendInvite(String email) {
         var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
+        String tokenBase64 = TokenHashService.generateToken(32);
+        String hashToken = TokenHashService.hashToken(tokenBase64);
+
         ProjectInviteEntity invite = this.projectInviteRepository.findByEmailAndProjectId(email, token.getProjectId())
                 .orElseThrow(() -> new InviteNotFoundException("Invite not found"));
 
         Instant now = Instant.now();
         invite.setCreatedAt(now);
         invite.setExpiredAt(now.plus(tokenTtl));
-        invite.setToken(UUID.randomUUID().toString());
+        invite.setToken(hashToken);
         invite.setInviteStatus(InviteStatus.SUBMITTED);
         invite.setInviter(this.membershipService.getCurrentProjectMembership());
 
         this.projectInviteRepository.save(invite);
 
-        String invitationUrl = frontendUrl + "/accept-invite?token=" + invite.getToken();
+        String invitationUrl = frontendUrl + "/accept-invite?token=" + tokenBase64;
 
         emailService.sendInvitationEmail(
                 email,
@@ -150,6 +158,7 @@ public class ProjectInviteService {
         invite.setExpiredAt(now.plus(tokenTtl));
         invite.setInviteStatus(InviteStatus.SUBMITTED);
         invite.setInviter(this.membershipService.getCurrentProjectMembership());
+        invite.setUserRole(userRole);
         this.projectInviteRepository.save(invite);
 
         return inviteMapper.projectInviteEntityToDto(invite);
@@ -164,27 +173,34 @@ public class ProjectInviteService {
         this.projectInviteRepository.delete(invite);
     }
 
-    public void acceptInvitation(String token) {
-        ProjectInviteEntity invite = this.projectInviteRepository.findProjectInviteEntityByToken(token)
+    public void acceptInvitation(String token)  {
+        String hashToken = TokenHashService.hashToken(token);
+
+        ProjectInviteEntity invite = this.projectInviteRepository.findProjectInviteEntityByToken(hashToken)
                 .orElseThrow(() -> new InviteTokenException("Token is expired"));
+        try{
 
-        if (this.projectMembershipRepository
-                .findProjectMembershipByUsernameAndProjectId(invite.getUser().getUsername(), invite.getProject().getId()).isPresent()) {
-            throw new IllegalArgumentException("User with username " + invite.getUser().getUsername() + " already exists");
+            if (this.projectMembershipRepository
+                    .findProjectMembershipByUsernameAndProjectId(invite.getUser().getUsername(), invite.getProject().getId()).isPresent()) {
+                throw new IllegalArgumentException("User with username " + invite.getUser().getUsername() + " already exists");
+            }
+
+            if (invite.getExpiredAt().isBefore(Instant.now())) {
+                invite.setInviteStatus(InviteStatus.EXPIRED);
+                this.projectInviteRepository.save(invite);
+                throw new InviteTokenException("Token is expired");
+            }
+
+            ProjectMembershipEntity projectMembership = ProjectMembershipEntity.builder()
+                    .project(invite.getProject())
+                    .user(invite.getUser())
+                    .userRole(invite.getUserRole())
+                    .projectUsername(invite.getUser().getUsername())
+                    .build();
+            this.membershipService.saveProjectMembership(projectMembership);
+        } finally{
+            this.projectInviteRepository.delete(invite);
         }
 
-        if (invite.getExpiredAt().isBefore(Instant.now())) {
-            invite.setInviteStatus(InviteStatus.EXPIRED);
-            this.projectInviteRepository.save(invite);
-            throw new InviteTokenException("Token is expired");
-        }
-
-        ProjectMembershipEntity projectMembership = ProjectMembershipEntity.builder()
-                .project(invite.getProject())
-                .user(invite.getUser())
-                .userRole(invite.getUserRole())
-                .projectUsername(invite.getUser().getUsername())
-                .build();
-        this.membershipService.saveProjectMembership(projectMembership);
     }
 }

@@ -85,7 +85,7 @@ CREATE TABLE storage.t_project_component
     c_start_date                  TIMESTAMP    NOT NULL,
     c_creator_id                  INTEGER REFERENCES storage.t_project_membership (c_id),
     c_created_at                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    c_global_status              VARCHAR(128)
+    c_global_status               VARCHAR(128)
 );
 
 
@@ -139,4 +139,12 @@ CREATE TABLE storage.t_project_invite
     c_expired_at    TIMESTAMP,
     c_inviter       INTEGER      NOT NULL REFERENCES storage.t_project_membership (c_id),
     c_invite_status VARCHAR(128) NOT NULL
+);
+
+CREATE TABLE storage.t_reset_password
+(
+    c_id         SERIAL PRIMARY KEY,
+    с_user_id    INTEGER      NOT NULL REFERENCES storage.t_user (c_id),
+    c_hash_token VARCHAR(512) NOT NULL,
+    c_expired_at TIMESTAMP
 );

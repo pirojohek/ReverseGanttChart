@@ -3,6 +3,7 @@ package by.pirog.ReverseGanttChart.controller;
 import by.pirog.ReverseGanttChart.dto.projectComponentDto.*;
 import by.pirog.ReverseGanttChart.service.projectComponent.ProjectComponentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class ProjectComponentController {
     @PostMapping("/action/create")
     public ResponseEntity<CreatedProjectComponentDto> createProjectComponent(@RequestBody CreateProjectComponentDto createProjectComponentDto) {
         CreatedProjectComponentDto response = this.projectComponentService.createProjectComponent(createProjectComponentDto);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping

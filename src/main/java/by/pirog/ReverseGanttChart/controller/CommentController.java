@@ -4,6 +4,8 @@ import by.pirog.ReverseGanttChart.dto.commentDto.CreateCommentDto;
 import by.pirog.ReverseGanttChart.dto.commentDto.CreatedCommentDto;
 import by.pirog.ReverseGanttChart.service.comment.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +22,8 @@ public class CommentController {
     @PostMapping("/create")
     public ResponseEntity<CreatedCommentDto> createComment(@RequestBody CreateCommentDto createCommentDto) {
         CreatedCommentDto createdCommentDto = commentService.createComment(createCommentDto);
-        return ResponseEntity.ok(createdCommentDto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(createdCommentDto);
     }
 }

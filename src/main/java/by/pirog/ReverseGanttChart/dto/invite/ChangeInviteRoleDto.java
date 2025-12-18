@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChangeInviteRoleDto {
 
-    String email;
+    private String email;
 
-    String role;
+    private String role;
 }

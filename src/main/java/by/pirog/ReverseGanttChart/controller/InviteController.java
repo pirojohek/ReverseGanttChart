@@ -20,7 +20,7 @@ public class InviteController {
 
     private final ProjectInviteService projectInviteService;
 
-    @PostMapping("/send")
+    @PostMapping("/action/send")
     public ResponseEntity<InviteResponseDto> sendInvite(
             @Valid @RequestBody InviteRequestDto inviteRequestDto
     ) {
@@ -32,11 +32,11 @@ public class InviteController {
     @PostMapping("/accept")
     public ResponseEntity<Void> acceptInvite(@RequestParam("token") String token){
         this.projectInviteService.acceptInvitation(token);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/action/all")
-    public ResponseEntity<List<InviteResponseDto>> getAllInvites(@RequestParam("token") String token){
+    public ResponseEntity<List<InviteResponseDto>> getAllInvites(){
         return ResponseEntity.ok(this.projectInviteService.getAllInvitesInProject());
     }
 

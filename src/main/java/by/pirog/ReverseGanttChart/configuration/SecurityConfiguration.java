@@ -108,7 +108,7 @@ public class SecurityConfiguration {
                 .logoutFilter(logoutFilter)
                 .redisTokenBlacklistService(redisTokenBlacklistService)
                 .permitAllForPatterns("/api/auth/register", "/api/auth/login", "/api/auth/logout", "/errors/**",
-                        "api/invite/accept");
+                        "api/invite/accept", "/api/password/**");
     }
 
     @Bean
@@ -128,6 +128,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("/api/auth/logout").permitAll()
                                 .requestMatchers("/errors/**").permitAll()
                                 .requestMatchers("/api/invite/accept").permitAll()
+                                .requestMatchers("/api/password/**").permitAll()
                                 .requestMatchers("/api/project/info/**")
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.VIEWER.getAuthority()))
                                 .requestMatchers("/api/project/action/**")
@@ -147,7 +148,7 @@ public class SecurityConfiguration {
 
                                 .requestMatchers("/api/membership/profile").access(authorizationManagerFactory.hasProjectAccess())
 
-                                .requestMatchers("/api/invite/action/send").access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))
+                                .requestMatchers("/api/invite/action/**").access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))
 
                                 .requestMatchers("/api/projectComponent/action/**")
                                     .access(authorizationManagerFactory.hasProjectAccessWithMinRole(UserRole.PLANNER.getAuthority()))

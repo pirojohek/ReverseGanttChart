@@ -3,6 +3,7 @@ package by.pirog.ReverseGanttChart.controller;
 import by.pirog.ReverseGanttChart.dto.projectDto.*;
 import by.pirog.ReverseGanttChart.service.project.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class ProjectController {
     @PostMapping("/create")
     public ResponseEntity<CreatedProjectDto> createProject(@RequestBody CreateProjectDto createProjectDto) {
 
-        return ResponseEntity.ok(projectService.createProject(createProjectDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(createProjectDto));
     }
 
     @DeleteMapping("/action/delete")

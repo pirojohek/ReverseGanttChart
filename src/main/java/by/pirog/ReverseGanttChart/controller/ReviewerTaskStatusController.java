@@ -5,6 +5,7 @@ import by.pirog.ReverseGanttChart.dto.reviwerStatusDto.ReviewerTaskStatusRespons
 import by.pirog.ReverseGanttChart.dto.reviwerStatusDto.SetReviewerTaskStatusRequestDto;
 import by.pirog.ReverseGanttChart.service.reviewerTaskStatus.ReviewerTaskStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +23,6 @@ public class ReviewerTaskStatusController {
     @PostMapping("/setTaskStatus")
     public ResponseEntity<ReviewerTaskStatusResponseDto> setTaskStatus(@RequestBody SetReviewerTaskStatusRequestDto dto){
         ReviewerTaskStatusResponseDto response = this.reviewerTaskStatusService.setReviewerTaskStatus(dto);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
