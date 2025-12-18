@@ -17,6 +17,7 @@ CREATE TABLE storage.t_project
     c_project_name        VARCHAR(512) NOT NULL,
     c_project_description TEXT,
     c_project_owner       INTEGER REFERENCES storage.t_user (c_id),
+    c_project_status      VARCHAR(128),
     c_created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     c_updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     c_deadline            TIMESTAMP
@@ -144,7 +145,7 @@ CREATE TABLE storage.t_project_invite
 CREATE TABLE storage.t_reset_password
 (
     c_id         SERIAL PRIMARY KEY,
-    с_user_id    INTEGER      NOT NULL REFERENCES storage.t_user (c_id),
+    c_user_id    INTEGER      NOT NULL REFERENCES storage.t_user (c_id),
     c_hash_token VARCHAR(512) NOT NULL,
     c_expired_at TIMESTAMP
 );
