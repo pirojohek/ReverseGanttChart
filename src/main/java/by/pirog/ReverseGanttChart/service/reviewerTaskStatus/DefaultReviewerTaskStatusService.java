@@ -71,7 +71,7 @@ public class DefaultReviewerTaskStatusService implements ReviewerTaskStatusServi
 
         reviewerTaskStatusEntity = this.reviewerTaskStatusRepository.save(reviewerTaskStatusEntity);
 
-        applicationEventPublisher.publishEvent(new ReviewerTaskStatusChangedEvent(reviewerTaskStatusEntity.getId(),
+        applicationEventPublisher.publishEvent(new ReviewerTaskStatusChangedEvent(projectComponent.getId(),
                 reviewerTaskStatusEntity.getTaskStatus()));
 
         return this.reviewerTaskStatusMapper.toReviewerTaskStatusResponseDto(reviewerTaskStatusEntity);

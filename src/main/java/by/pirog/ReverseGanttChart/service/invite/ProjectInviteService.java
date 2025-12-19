@@ -186,7 +186,6 @@ public class ProjectInviteService {
             }
 
             if (invite.getExpiredAt().isBefore(Instant.now())) {
-                invite.setInviteStatus(InviteStatus.EXPIRED);
                 this.projectInviteRepository.save(invite);
                 throw new InviteTokenException("Token is expired");
             }

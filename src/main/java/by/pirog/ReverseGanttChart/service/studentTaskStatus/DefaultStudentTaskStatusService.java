@@ -75,7 +75,7 @@ public class DefaultStudentTaskStatusService implements StudentTaskStatusService
 
         studentTaskStatusEntity = studentTaskStatusRepository.save(studentTaskStatusEntity);
 
-        this.applicationEventPublisher.publishEvent(new StudentTaskStatusChangedEvent(studentTaskStatusEntity.getId(), studentTaskStatusEntity.getStatus()));
+        this.applicationEventPublisher.publishEvent(new StudentTaskStatusChangedEvent(projectComponent.getId(), studentTaskStatusEntity.getStatus()));
 
         return this.studentTaskStatusMapper.toStudentTaskStatusDto(studentTaskStatusEntity);
     }
