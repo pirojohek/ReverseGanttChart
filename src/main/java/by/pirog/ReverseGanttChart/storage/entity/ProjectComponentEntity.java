@@ -83,7 +83,7 @@ public class ProjectComponentEntity {
             return;
         }
         this.deadline = LocalDateTime.of(date, time)
-                .atZone(UTC_ZONE)
+                .atZone(ZoneId.systemDefault())
                 .toInstant();
     }
 
@@ -93,7 +93,7 @@ public class ProjectComponentEntity {
             return;
         }
         this.deadline = LocalDateTime.of(localDate, LocalTime.MIN)
-                .atZone(UTC_ZONE)
+                .atZone(ZoneId.systemDefault())
                 .toInstant();
     }
 
@@ -103,7 +103,7 @@ public class ProjectComponentEntity {
             return;
         }
         this.startDate = LocalDateTime.of(date, LocalTime.MIN)
-                .atZone(UTC_ZONE)
+                .atZone(ZoneId.systemDefault())
                 .toInstant();
     }
 
@@ -113,14 +113,8 @@ public class ProjectComponentEntity {
             return;
         }
         this.startDate = LocalDateTime.of(date, time)
-                .atZone(UTC_ZONE)
+                .atZone(ZoneId.systemDefault())
                 .toInstant();
-    }
-
-    public LocalDateTime getCreatedAtAsLocalDateTime() {
-        return createdAt != null
-                ? LocalDateTime.ofInstant(createdAt, ZoneId.systemDefault())
-                : null;
     }
 
     public LocalDateTime getStartDateAsLocalDateTime() {
@@ -132,30 +126,6 @@ public class ProjectComponentEntity {
     public LocalDateTime getDeadlineAsLocalDateTime() {
         return deadline != null
                 ? LocalDateTime.ofInstant(deadline, ZoneId.systemDefault())
-                : null;
-    }
-
-    public LocalDate getStartDateAsLocalDate() {
-        return startDate != null
-                ? startDate.atZone(UTC_ZONE).toLocalDate()
-                : null;
-    }
-
-    public LocalDate getDeadlineAsLocalDate() {
-        return deadline != null
-                ? deadline.atZone(UTC_ZONE).toLocalDate()
-                : null;
-    }
-
-    public LocalTime getStartDateAsLocalTime() {
-        return startDate != null
-                ? startDate.atZone(UTC_ZONE).toLocalTime()
-                : null;
-    }
-
-    public LocalTime getDeadlineAsLocalTime() {
-        return deadline != null
-                ? deadline.atZone(UTC_ZONE).toLocalTime()
                 : null;
     }
 

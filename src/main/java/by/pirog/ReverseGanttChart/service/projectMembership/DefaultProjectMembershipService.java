@@ -137,11 +137,11 @@ public class DefaultProjectMembershipService implements GetProjectMembershipByUs
     }
 
     @Override
-    public ProjectMembershipEntity getProjectMembershipByEmail(String projectUsername) {
+    public ProjectMembershipEntity getProjectMembershipByEmail(String email) {
         var token = (CustomAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 
-        return this.projectMembershipRepository.findProjectMembershipByProjectUsernameAndProjectId(projectUsername, token.getProjectId())
-                .orElseThrow(() -> new UserIsNotMemberInProjectException("User with project username " + projectUsername + " not found"));
+        return this.projectMembershipRepository.findProjectMembershipByUserEmailAndProjectId(email, token.getProjectId())
+                .orElseThrow(() -> new UserIsNotMemberInProjectException("User with email " + email + " not found"));
     }
 
     @Override
